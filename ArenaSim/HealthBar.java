@@ -1,4 +1,4 @@
-package Battle2;
+package ArenaSim_DataStructure.ArenaSim;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
