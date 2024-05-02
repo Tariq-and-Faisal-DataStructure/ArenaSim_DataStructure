@@ -132,16 +132,20 @@ public class Player extends Map implements Updatable{
             for(Player attackMe:enemies){
                 if(attackMe.getAttackWho() == atack_who){
                     this.atacking_me.add(attackMe);
-                //     if(this.atacking_me.size() < 4 ){
-                //         System.out.println(this.getName());
-                //      for(int i = 0; i<atacking_me.size(); i++){
-                //          if(atacking_me.get(i) != null){
-                //              System.out.println(atacking_me.get(i).getName());
-                //          }
-                //      }
-                //      System.out.println("-----------------------------");
-                //      stop +=1;
-                //  }
+                    if(this.atacking_me.size() < 4 ){
+                        System.out.println(this.getName());
+                     for(int i = 0; i<atacking_me.size(); i++){
+                         if(atacking_me.get(i) != null){
+                             System.out.println(atacking_me.get(i).getName());
+                         }
+                     }
+                     System.out.println("-----------------------------");
+                     stop +=1;
+                 }
+                }
+                else if(this.atacking_me.contains(attackMe) && attackMe.getAttackWho() != atack_who){
+                    this.atacking_me.remove(attackMe);
+                    System.out.println(attackMe.getName() +" is removed from" + " " + this.getName());
                 }
                
             }
@@ -149,6 +153,8 @@ public class Player extends Map implements Updatable{
 
             return atacking_me;
         }
+
+        public void UpdateAtackingMe(){}
 
     public Player getAttackWho(){
         return this.atack_who;
