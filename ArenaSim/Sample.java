@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 
+
 public class Sample extends Application {
     private Timeline gameLoop;
     public static boolean endgameflag;
@@ -179,6 +180,20 @@ public class Sample extends Application {
         List<Player> toRemove = new ArrayList<>();
 
         for (Player character : characters) {
+
+            // for(Player target: targets){
+            // if(target.getAttackWho() == character ){
+            //     character.setAtackingMe(target);
+            //     // System.out.println(target.getName());
+            //     // System.out.println("---------------")
+            //     character.AtackingMe(targets,character);
+            // }
+           
+            // }
+
+            character.AtackingMe(targets, character);
+            
+
             // Check for character death
             if (character.die(character.getHealth())) {
                 toRemove.add(character);
@@ -269,7 +284,9 @@ public class Sample extends Application {
         }
     
         attacker.setIsAtacking(true); // Mark attacker as attacking
-    
+        
+        
+
         long attackDelay = (long) (1000 / attacker.getAtk_speed());
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
     
@@ -383,6 +400,7 @@ private void checkCollisionsWithMovableObstacles() {
 
     private void checkEndConditions() {
         if (gameStart && (players.isEmpty() || enemies.isEmpty())){
+            
             endGame();
         }
     }

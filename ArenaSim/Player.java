@@ -3,6 +3,8 @@ package ArenaSim_DataStructure.ArenaSim;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.scene.shape.Circle;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -18,6 +20,9 @@ public class Player extends Map implements Updatable{
     private volatile boolean isAttacking = false;
     private volatile Player currentTarget;
     private HealthBar healthBar;
+    private Player atack_who;
+    private List<Player> atacking_me = new ArrayList<>();
+    private int stop;
 
 
     public Player(){}
@@ -59,6 +64,7 @@ public class Player extends Map implements Updatable{
             }
         }
     
+        this.atack_who = closestPlayer;
         return closestPlayer;
     }
     
@@ -118,7 +124,35 @@ public class Player extends Map implements Updatable{
     public void initializePlayer(double initialX, double initialY) {
             this.setReadLocation(new Point2D(initialX, initialY));
     }
+
+
     
+        public List<Player> AtackingMe(List<Player> enemies, Player attackWho){
+
+            for(Player attackMe:enemies){
+                if(attackMe.getAttackWho() == atack_who){
+                    this.atacking_me.add(attackMe);
+                //     if(this.atacking_me.size() < 4 ){
+                //         System.out.println(this.getName());
+                //      for(int i = 0; i<atacking_me.size(); i++){
+                //          if(atacking_me.get(i) != null){
+                //              System.out.println(atacking_me.get(i).getName());
+                //          }
+                //      }
+                //      System.out.println("-----------------------------");
+                //      stop +=1;
+                //  }
+                }
+               
+            }
+           
+
+            return atacking_me;
+        }
+
+    public Player getAttackWho(){
+        return this.atack_who;
+    }
 
     @Override
     public Circle getShape() {
@@ -194,6 +228,12 @@ public class Player extends Map implements Updatable{
         this.currentTarget = currentTarget;
     }
 
+    public void setAtackingMe(Player enemy){
+        this.atacking_me.add(enemy);
+    }
     
+    public void setAtackwho(Player enemy){
+        this.atack_who= enemy;
+    }
 
 }
