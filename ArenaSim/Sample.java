@@ -190,7 +190,7 @@ public class Sample extends Application {
             // }
            
             // }
-
+///
             
             character.AtackingMe(targets, character);
             
