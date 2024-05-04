@@ -124,6 +124,7 @@ public class Player extends Map implements Updatable{
     public void initializePlayer(double initialX, double initialY) {
             this.setReadLocation(new Point2D(initialX, initialY));
     }
+    
 
 
     
