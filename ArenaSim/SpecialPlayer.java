@@ -1,5 +1,9 @@
 package ArenaSim_DataStructure.ArenaSim;
 
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.PriorityQueue;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.scene.shape.Circle;
@@ -10,6 +14,9 @@ public class SpecialPlayer extends Player {
     private long cooldownEndTime;
     private static final long RUN_DURATION = 10000; // 10 seconds
     private static final long COOLDOWN_DURATION = 15000; // 15 seconds
+    private static  PriorityQueue<Integer> priorityQueue = new PriorityQueue<>(); // Data structure
+    private static LinkedList<Integer> priorites = new LinkedList<>();
+    
     
     
     public SpecialPlayer(){}
@@ -20,9 +27,60 @@ public class SpecialPlayer extends Player {
         this.isRunning = false;
         this.runEndTime = 0;
         this.cooldownEndTime = 0;
+        priorites.add(2); // attack
+        priorites.add(1); // run away when health below 25%
     }
 
+    // Sorting Algorithim
+    public static void pqSort() {
+        int n = priorites.size();
+        // Assuming LinkedList.remove() here simulates priorites.remove(priorites.first())
+        for (int j = 0; j < n; j++) {
+            Integer element = priorites.removeFirst(); // Removes the first element, which is equivalent to priorites.remove(priorites.first())
+            priorityQueue.add(element); // Use add instead of insert
+        }
+        for (int j = 0; j < n; j++) {
+            Integer element = priorityQueue.poll(); // Retrieves and removes the head of the queue, the smallest element
+            priorites.addLast(element); // Adds the element at the end of the list
+        }
+    }
 
+     // iterate over enemies to check if any of them is attacking me
+    // public void checkAttackingMe(List<Player> enemies){
+    //     for(Player enemy:enemies){
+    //         if(enemy.getAttackWho() == this){
+    //             this.setAtackingMe(enemy);;
+    //         }
+    //     }
+
+    // }
+
+    @Override
+    public void updatePriority(Player enemy){
+        if(this.getHealth() < this.getMaxHealth() * 0.25 && this.getAttackingMe() != null){
+            pqSort();
+        }
+        else{
+            priorityQueue.clear();
+            priorityQueue.addAll(priorites);
+        }
+
+    }
+    
+ 
+
+    // calls the methods based on the priority
+    public void handlePriority(){
+
+        if(this.priorityQueue.peek() == 1){
+            this.shouldStartRunning();
+        }
+        else if(this.priorityQueue.peek() == 2){
+            stopRunning();
+        }
+    }
+    
+    // when running, move to opposite direction of the attacker
     public void moveTowardsOppositeDirection(double targetX, double targetY){
         Point2D currentLocation = this.getReadLocation();
         double currentX = currentLocation.getX();
@@ -56,11 +114,10 @@ public class SpecialPlayer extends Player {
 
     public void updateRunningStatus() {
         // Start running if the conditions are met and the player is not already running
-        if (shouldStartRunning()) {
+        if(this.priorityQueue.peek() == 1){
             startRunning();
-        } 
-        // Stop running if the running time has elapsed
-        else if (isRunning && System.currentTimeMillis() > runEndTime) {
+        }
+        else if(this.priorityQueue.peek() == 2){
             stopRunning();
         }
     }
@@ -74,13 +131,11 @@ public class SpecialPlayer extends Player {
     private void startRunning() {
         // Set isRunning to true and determine when the running should end
         isRunning = true;
-        runEndTime = System.currentTimeMillis() + RUN_DURATION; // Set the duration for running
     }
     
     private void stopRunning() {
         // Set isRunning to false and start the cooldown
         isRunning = false;
-        cooldownEndTime = System.currentTimeMillis() + COOLDOWN_DURATION; // Set the cooldown duration
     }
 
     // Override getDamage if damage changes when running
@@ -92,16 +147,9 @@ public class SpecialPlayer extends Player {
         return super.getDamage();
     }
 
-    
-
     public void update() {
-        if (isRunning && System.currentTimeMillis() > runEndTime) {
-            stopRunning();
-        }
+        handlePriority();
     }
-
-    
-    
 
     public boolean getIsRunning(){
         return isRunning;
