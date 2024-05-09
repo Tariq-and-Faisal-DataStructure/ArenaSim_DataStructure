@@ -17,7 +17,6 @@ import javafx.stage.Stage;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 
-
 public class Sample extends Application {
     private Timeline gameLoop;
     public static boolean endgameflag;
@@ -32,75 +31,78 @@ public class Sample extends Application {
     final double minX = 0.0;
     final double maxX = 1280.0; // Width of the arena
     final double minY = 0.0;
-    final double maxY = 720.0;  // Height of the arena
+    final double maxY = 720.0; // Height of the arena
     private static boolean gameStart = false;
-
 
     // Hard codded obstacles:
     public static Circle rockCircle = new Circle(300, 300, 30, Color.BROWN);
-    public static Obstacles rock = new Obstacles(0, "Rock",rockCircle);
+    public static Obstacles rock = new Obstacles(0, "Rock", rockCircle);
 
     public static Circle holeCircle = new Circle(400, 400, 30, Color.BLACK);
-    public static Obstacles hole = new Obstacles(1000000000, "Hole",holeCircle);
+    public static Obstacles hole = new Obstacles(1000000000, "Hole", holeCircle);
 
     public static Circle undergroundshaftCircle = new Circle(500, 300, 30, Color.GRAY);
-    public static Obstacles undergroundshaft = new Obstacles(40, "UnderGroundShaft",undergroundshaftCircle);
-    
-    public static Circle meteorCircle = new Circle(50, 50, 70, Color.ORANGE); 
-    public static MovableObstacles meteor = new MovableObstacles(1000000000, "Meteor", 0, meteorCircle);
-    
-    public static Circle movingShaftCircle = new Circle(600, 300, 30, Color.DARKGRAY); 
-    public static MovableObstacles movingShaft = new MovableObstacles(40, "MovingUnderGroundShaft", 2, movingShaftCircle);
+    public static Obstacles undergroundshaft = new Obstacles(40, "UnderGroundShaft", undergroundshaftCircle);
 
-    
-    
-    
-    public static Scene createArenaScene(Stage primaryStage, List<CharacterSelection.CharacterAttributes> playerCharacters, List<CharacterSelection.CharacterAttributes> enemyCharacters) {
+    public static Circle meteorCircle = new Circle(50, 50, 70, Color.ORANGE);
+    public static MovableObstacles meteor = new MovableObstacles(1000000000, "Meteor", 0, meteorCircle);
+
+    public static Circle movingShaftCircle = new Circle(600, 300, 30, Color.DARKGRAY);
+    public static MovableObstacles movingShaft = new MovableObstacles(40, "MovingUnderGroundShaft", 2,
+            movingShaftCircle);
+
+    public static Scene createArenaScene(Stage primaryStage,
+            List<CharacterSelection.CharacterAttributes> playerCharacters,
+            List<CharacterSelection.CharacterAttributes> enemyCharacters) {
         List<Player> localPlayers = new ArrayList<>();
         List<Player> localEnemies = new ArrayList<>();
         Scene mainMenuScene = mainMenu.createMainMenuContent();
-        Arena arena = new Arena(primaryStage, mainMenuScene); 
+        Arena arena = new Arena(primaryStage, mainMenuScene);
         Pane root = arena.setupArena(localPlayers, localEnemies);
-        root.getChildren().addAll(rockCircle,holeCircle,undergroundshaftCircle);
+        root.getChildren().addAll(rockCircle, holeCircle, undergroundshaftCircle);
 
         // Add to the list and to the root pane
         root.getChildren().addAll(meteorCircle, movingShaftCircle);
-    
+
         // Create players and enemies via CharacerSelection class
         for (CharacterSelection.CharacterAttributes charAttr : playerCharacters) {
-            if (!charAttr.isSpecialPlayer){
-                Circle blueTeamCircle = new Circle(charAttr.xAxis, charAttr.yAxis ,10, Color.BLUE);
-                Player blueTeam = new Player(charAttr.health, charAttr.attackSpeed, charAttr.damage, charAttr.movementSpeed, charAttr.name, blueTeamCircle);
+            if (!charAttr.isSpecialPlayer) {
+                Circle blueTeamCircle = new Circle(charAttr.xAxis, charAttr.yAxis, 10, Color.BLUE);
+                Player blueTeam = new Player(charAttr.health, charAttr.attackSpeed, charAttr.damage,
+                        charAttr.movementSpeed, charAttr.name, blueTeamCircle);
                 blueTeam.setReadLocation(new Point2D(charAttr.xAxis, charAttr.yAxis));
                 root.getChildren().add(blueTeamCircle);
                 localPlayers.add(blueTeam);
-                HealthBar playerHealthBar = blueTeam.getHealthBar(); // Assuming getHealthBar() method is defined in Player
-                root.getChildren().add(playerHealthBar.getBar()); 
-            }
-            else{
-                Circle blueTeamCircle = new Circle(charAttr.xAxis, charAttr.yAxis ,10, Color.BLUEVIOLET);
-                SpecialPlayer blueTeam = new SpecialPlayer(charAttr.health, charAttr.attackSpeed, charAttr.damage, charAttr.movementSpeed, charAttr.name, blueTeamCircle);
+                HealthBar playerHealthBar = blueTeam.getHealthBar(); // Assuming getHealthBar() method is defined in
+                                                                     // Player
+                root.getChildren().add(playerHealthBar.getBar());
+            } else {
+                Circle blueTeamCircle = new Circle(charAttr.xAxis, charAttr.yAxis, 10, Color.BLUEVIOLET);
+                SpecialPlayer blueTeam = new SpecialPlayer(charAttr.health, charAttr.attackSpeed, charAttr.damage,
+                        charAttr.movementSpeed, charAttr.name, blueTeamCircle);
                 blueTeam.setReadLocation(new Point2D(charAttr.xAxis, charAttr.yAxis));
                 root.getChildren().add(blueTeamCircle);
                 localPlayers.add(blueTeam);
-                HealthBar playerHealthBar = blueTeam.getHealthBar(); // Assuming getHealthBar() method is defined in Player
-                root.getChildren().add(playerHealthBar.getBar()); 
+                HealthBar playerHealthBar = blueTeam.getHealthBar(); // Assuming getHealthBar() method is defined in
+                                                                     // Player
+                root.getChildren().add(playerHealthBar.getBar());
             }
         }
-    
+
         for (CharacterSelection.CharacterAttributes charAttr : enemyCharacters) {
-            if (!charAttr.isSpecialPlayer){
+            if (!charAttr.isSpecialPlayer) {
                 Circle redTeamCircle = new Circle(charAttr.xAxis, charAttr.yAxis, 10, Color.RED);
-                Player redTeam = new Player(charAttr.health, charAttr.attackSpeed, charAttr.damage, charAttr.movementSpeed, charAttr.name, redTeamCircle);
+                Player redTeam = new Player(charAttr.health, charAttr.attackSpeed, charAttr.damage,
+                        charAttr.movementSpeed, charAttr.name, redTeamCircle);
                 redTeam.setReadLocation(new Point2D(charAttr.xAxis, charAttr.yAxis));
                 root.getChildren().add(redTeamCircle);
                 localEnemies.add(redTeam);
                 HealthBar enemyHealthBar = redTeam.getHealthBar();
                 root.getChildren().add(enemyHealthBar.getBar());
-            }
-            else{
+            } else {
                 Circle redTeamCircle = new Circle(charAttr.xAxis, charAttr.yAxis, 10, Color.PURPLE);
-                SpecialPlayer redTeam = new SpecialPlayer(charAttr.health, charAttr.attackSpeed, charAttr.damage, charAttr.movementSpeed, charAttr.name, redTeamCircle);
+                SpecialPlayer redTeam = new SpecialPlayer(charAttr.health, charAttr.attackSpeed, charAttr.damage,
+                        charAttr.movementSpeed, charAttr.name, redTeamCircle);
                 redTeam.setReadLocation(new Point2D(charAttr.xAxis, charAttr.yAxis));
                 root.getChildren().add(redTeamCircle);
                 localEnemies.add(redTeam);
@@ -108,14 +110,12 @@ public class Sample extends Application {
                 root.getChildren().add(enemyHealthBar.getBar());
             }
         }
-        
+
         // Initialize movements and attacks
         players = localPlayers; // Assign to class member
         enemies = localEnemies; // Assign to class member
         return new Scene(root, 1280, 720);
     }
-    
-    
 
     @Override
     public void start(Stage primaryStage) {
@@ -124,14 +124,14 @@ public class Sample extends Application {
 
         movableObstacles = Arrays.asList(meteor, movingShaft);
         obstacles = Arrays.asList(rock, hole, undergroundshaft);
-        
+
         mainMenu = new Main_menu(primaryStage);
         System.out.println("in start");
         Scene mainMenuScene = mainMenu.createMainMenuContent();
         primaryStage.setTitle("Battle Arena");
         primaryStage.setScene(mainMenuScene);
         primaryStage.show();
-    
+
         initializeGameplay();
     }
 
@@ -157,7 +157,7 @@ public class Sample extends Application {
 
         // Optionally reset any other game-related states or counters
         // For example, resetting score, health, or other game mechanics
-        // resetScore();  // If you have a method or logic to reset scores
+        // resetScore(); // If you have a method or logic to reset scores
 
         // Log reset for debugging purposes
         System.out.println("Game conditions have been reset");
@@ -169,12 +169,11 @@ public class Sample extends Application {
         updateAllCharacters(players, enemies);
         // Update all red team members
         updateAllCharacters(enemies, players);
-       
 
         // Check if the game should end
         checkEndConditions();
     }
-    
+
     // main loop 3 calls the updating methods
     private void updateAllCharacters(List<Player> characters, List<Player> targets) {
         List<Player> toRemove = new ArrayList<>();
@@ -183,22 +182,27 @@ public class Sample extends Application {
 
             // for(Player target: targets){
             // if(target.getAttackWho() == character ){
-            //     character.setAtackingMe(target);
-            //     // System.out.println(target.getName());
-            //     // System.out.println("---------------")
-            //     character.AtackingMe(targets,character);
+            // character.setAtackingMe(target);
+            // // System.out.println(target.getName());
+            // // System.out.println("---------------")
+            // character.AtackingMe(targets,character);
             // }
-           
-            // }
-            
-            character.AtackingMe(targets, character);
-            
 
+            // }
+
+            // ********************* why print dose not work ******************
+
+            // the problem is that target will be added at one time so when we add the
+            // player is attkeing who he added all play imedetly isntade of wating to kill
+            // then move to another target
+            // character.AtackingMe(targets, character);
+            // *******************************************************************************************8888888888
+            // */
             // Check for character death
             if (character.die(character.getHealth())) {
                 toRemove.add(character);
                 handlePlayerDeath(character);
-                
+
                 continue; // Skip the rest of the processing for dead characters
             }
             gameStart = true;
@@ -211,32 +215,37 @@ public class Sample extends Application {
             if (character instanceof SpecialPlayer) {
                 SpecialPlayer specialPlayer = (SpecialPlayer) character;
                 specialPlayer.updateRunningStatus();
-    
+
                 if (specialPlayer.getIsRunning()) {
+
                     Player closestTarget = character.findClosestOponent(targets, character);
+                    // specialPlayer.AtackingMe(targets, specialPlayer);
+
                     if (closestTarget != null) {
                         Circle targetCircle = closestTarget.getShape();
-                        specialPlayer.moveTowardsOppositeDirection(targetCircle.getCenterX(), targetCircle.getCenterY());
+                        specialPlayer.moveTowardsOppositeDirection(targetCircle.getCenterX(),
+                                targetCircle.getCenterY());
                     }
                     continue; // Skip the rest of the loop for the running SpecialPlayer
                 }
             }
-    
-            // Normal movement or resuming movement after running
             Player closestTarget = character.findClosestOponent(targets, character);
+            // closestTarget.AtackingMe(targets, closestTarget);
+
+            // Normal movement or resuming movement after running
             if (closestTarget != null && !character.getIsAtacking()) {
                 Circle characterCircle = character.getShape();
                 Circle targetCircle = closestTarget.getShape();
-    
+
                 boolean isCollision = character.checkPlayerCollision(characterCircle, targetCircle);
-    
+
                 if (!isCollision) {
                     character.moveTowards(targetCircle.getCenterX(), targetCircle.getCenterY());
                 } else {
                     handleAttack(character, closestTarget);
                 }
             }
-    
+
             // Check for collisions with obstacles
             for (Obstacles obstacle : obstacles) {
                 if (character.checkPlayerCollision(character.getShape(), obstacle.getShape())) {
@@ -248,49 +257,49 @@ public class Sample extends Application {
 
         updateMovableObstacles();
         checkCollisionsWithMovableObstacles();
-    
+
         characters.removeAll(playersMarkedForRemoval);
         targets.removeAll(enemiesMarkedForRemoval);
-    
+
         // Clear the marked lists for the next iteration
         playersMarkedForRemoval.clear();
-        enemiesMarkedForRemoval.clear();  
-    
+        enemiesMarkedForRemoval.clear();
+
     }
-    
-        // Mainly updates the position of Movable Obstacles
-        private void updateMovableObstacles() {
-            for (MovableObstacles obstacle : movableObstacles) {
-                switch (obstacle.getObstacleName()) {
-                    case "MovingUnderGroundShaft":
-                        // updatePosition method for linear movement
-                        obstacle.updatePosition();
-                        break;
-                    case "Meteor":
-                        // meteor appearance and disappearance
-                        handleMeteorBehavior(obstacle);
-                        break;
-                }
+
+    // Mainly updates the position of Movable Obstacles
+    private void updateMovableObstacles() {
+        for (MovableObstacles obstacle : movableObstacles) {
+            switch (obstacle.getObstacleName()) {
+                case "MovingUnderGroundShaft":
+                    // updatePosition method for linear movement
+                    obstacle.updatePosition();
+                    break;
+                case "Meteor":
+                    // meteor appearance and disappearance
+                    handleMeteorBehavior(obstacle);
+                    break;
             }
         }
-        
-        private void handleMeteorBehavior(MovableObstacles obstacle) {
-            obstacle.updateMeteor(); // Update meteor visibility and position
-        }
+    }
+
+    private void handleMeteorBehavior(MovableObstacles obstacle) {
+        obstacle.updateMeteor(); // Update meteor visibility and position
+    }
 
     private void handleAttack(Player attacker, Player defender) {
         if (attacker.getIsAtacking() || attacker == defender) {
+
             return; // Skip if already attacking or self-targeted
         }
-    
+
         attacker.setIsAtacking(true); // Mark attacker as attacking
-        
-        
 
         long attackDelay = (long) (1000 / attacker.getAtk_speed());
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-    
+
         executor.schedule(() -> {
+            attacker.getEnimesRefrense(defender);// new
             if (!attacker.die(attacker.getHealth()) && !defender.die(defender.getHealth())) {
                 defender.setHealth(defender.takeDamage(defender.getHealth(), attacker.getDamage()));
                 Platform.runLater(() -> {
@@ -303,10 +312,10 @@ public class Sample extends Application {
             executor.shutdown(); // Terminate the scheduled task
         }, attackDelay, TimeUnit.MILLISECONDS);
     }
-    
 
     private void handlePlayerDeath(Player deadPlayer) {
-        // Ensure removal of the player's graphical representation is done on the JavaFX Application Thread
+        // Ensure removal of the player's graphical representation is done on the JavaFX
+        // Application Thread
         Platform.runLater(() -> {
             Circle character = deadPlayer.getShape();
             HealthBar healthBar = deadPlayer.getHealthBar();
@@ -316,91 +325,86 @@ public class Sample extends Application {
                 if (healthBar != null && healthBar.getBar().getParent() == gamePane) {
                     gamePane.getChildren().remove(healthBar.getBar()); // Remove health bar
                 }
-    
+
                 // Update the event log with the death message
                 if (Arena.eventLog != null) {
                     Arena.eventLog.appendText(deadPlayer.getName() + " has died.\n");
                 }
             }
         });
-    
+
         // Mark the player for removal instead of direct removal
         playersMarkedForRemoval.add(deadPlayer);
         enemiesMarkedForRemoval.add(deadPlayer);
-        if (gameStart && (players.isEmpty() || enemies.isEmpty())){
-            endgameflag =true;
+        if (gameStart && (players.isEmpty() || enemies.isEmpty())) {
+            endgameflag = true;
         }
         // Check if the game should end due to this death
         checkEndConditions();
     }
-    
 
-private void handleObstacleCollision(Player player, Obstacles obstacle) {
-    player.setHealth(player.takeDamage(player.getHealth() ,obstacle.getDamage()));
+    private void handleObstacleCollision(Player player, Obstacles obstacle) {
+        player.setHealth(player.takeDamage(player.getHealth(), obstacle.getDamage()));
 
-    // Check if the player dies due to obstacle collision
-    if (player.die(player.getHealth())) {
-        handlePlayerDeath(player);
+        // Check if the player dies due to obstacle collision
+        if (player.die(player.getHealth())) {
+            handlePlayerDeath(player);
+        }
     }
-}
 
-private void checkCollisionsWithMovableObstacles() {
-    for (MovableObstacles obstacle : movableObstacles) {
-        if (obstacle.getObstacleName().equals("Meteor") && obstacle.getShape().isVisible()) {
-            for (Player player : players) {
-                if (player.checkPlayerCollision(player.getShape(), obstacle.getShape())) {
-                    // Apply meteor's damage to members of the blue team
-                    player.setHealth(player.takeDamage(player.getHealth(), obstacle.getDamage()));
-                    if (player.die(player.getHealth())) {
-                        handlePlayerDeath(player);
+    private void checkCollisionsWithMovableObstacles() {
+        for (MovableObstacles obstacle : movableObstacles) {
+            if (obstacle.getObstacleName().equals("Meteor") && obstacle.getShape().isVisible()) {
+                for (Player player : players) {
+                    if (player.checkPlayerCollision(player.getShape(), obstacle.getShape())) {
+                        // Apply meteor's damage to members of the blue team
+                        player.setHealth(player.takeDamage(player.getHealth(), obstacle.getDamage()));
+                        if (player.die(player.getHealth())) {
+                            handlePlayerDeath(player);
+                        }
+                    }
+                }
+
+                for (Player enemy : enemies) {
+                    if (enemy.checkPlayerCollision(enemy.getShape(), obstacle.getShape())) {
+                        // Apply meteor's damage to the members of red team
+                        enemy.setHealth(enemy.takeDamage(enemy.getHealth(), obstacle.getDamage()));
+                        if (enemy.die(enemy.getHealth())) {
+                            handlePlayerDeath(enemy);
+                        }
                     }
                 }
             }
+        }
 
-            for (Player enemy : enemies) {
-                if (enemy.checkPlayerCollision(enemy.getShape(), obstacle.getShape())) {
-                    // Apply meteor's damage to the members of red team 
-                    enemy.setHealth(enemy.takeDamage(enemy.getHealth(), obstacle.getDamage()));
-                    if (enemy.die(enemy.getHealth())) {
-                        handlePlayerDeath(enemy);
+        for (MovableObstacles obstacle : movableObstacles) {
+            if (obstacle.getObstacleName().equals("MovingUnderGroundShaft") && obstacle.getShape().isVisible()) {
+                for (Player player : players) {
+                    if (player.checkPlayerCollision(player.getShape(), obstacle.getShape())) {
+                        // Apply meteor's damage to the members of blue team
+                        player.setHealth(player.takeDamage(player.getHealth(), obstacle.getDamage()));
+                        if (player.die(player.getHealth())) {
+                            handlePlayerDeath(player);
+                        }
+                    }
+                }
+
+                for (Player enemy : enemies) {
+                    if (enemy.checkPlayerCollision(enemy.getShape(), obstacle.getShape())) {
+                        // Apply meteor's damage to the members of red team
+                        enemy.setHealth(enemy.takeDamage(enemy.getHealth(), obstacle.getDamage()));
+                        if (enemy.die(enemy.getHealth())) {
+                            handlePlayerDeath(enemy);
+                        }
                     }
                 }
             }
         }
     }
-
-     for (MovableObstacles obstacle : movableObstacles) {
-        if (obstacle.getObstacleName().equals("MovingUnderGroundShaft") && obstacle.getShape().isVisible()) {
-            for (Player player : players) {
-                if (player.checkPlayerCollision(player.getShape(), obstacle.getShape())) {
-                    // Apply meteor's damage to the members of blue team
-                    player.setHealth(player.takeDamage(player.getHealth(), obstacle.getDamage()));
-                    if (player.die(player.getHealth())) {
-                        handlePlayerDeath(player);
-                    }
-                }
-            }
-
-            for (Player enemy : enemies) {
-                if (enemy.checkPlayerCollision(enemy.getShape(), obstacle.getShape())) {
-                    // Apply meteor's damage to the members of red team
-                    enemy.setHealth(enemy.takeDamage(enemy.getHealth(), obstacle.getDamage()));
-                    if (enemy.die(enemy.getHealth())) {
-                        handlePlayerDeath(enemy);
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-
-   
 
     private void checkEndConditions() {
-        if (gameStart && (players.isEmpty() || enemies.isEmpty())){
-            
+        if (gameStart && (players.isEmpty() || enemies.isEmpty())) {
+
             endGame();
         }
     }
@@ -409,9 +413,9 @@ private void checkCollisionsWithMovableObstacles() {
         Platform.runLater(() -> {
             resetGameConditions();
             Leaderboard leaderboard = new Leaderboard(primaryStage, mainMenu.createMainMenuContent());
-            Scene leaderboardScene = leaderboard.createLeaderboardScene(new ArrayList<>(players), new ArrayList<>(enemies));
+            Scene leaderboardScene = leaderboard.createLeaderboardScene(new ArrayList<>(players),
+                    new ArrayList<>(enemies));
             primaryStage.setScene(leaderboardScene);
-            
 
         });
         endgameflag = false;

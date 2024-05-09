@@ -1,6 +1,5 @@
 package ArenaSim_DataStructure.ArenaSim;
 
-
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -38,7 +37,7 @@ public class Arena {
         arenaView = new ImageView(bgImage);
     }
 
-    public Arena (Scene mainMenuScene){
+    public Arena(Scene mainMenuScene) {
         this.mainMenuScene = mainMenuScene;
     }
 
@@ -49,44 +48,37 @@ public class Arena {
     public Pane setupArena(List<Player> players, List<Player> enemies) {
         BorderPane root = new BorderPane();
         root.getChildren().add(getArenaView()); // Add the background image
-    
+
         // Pause button setup
         pauseButton = new Button("Pause");
         pauseButton.setOnAction(event -> showPauseMenu());
         root.setTop(pauseButton);
-    
+
         // Timer and event log container
         VBox rightContainer = new VBox(0); // Spacing between elements
         rightContainer.setPadding(new Insets(0));
-    
+
         // Timer Label
         Label timeLabel = new Label("Time: 00:00");
         timeLabel.setStyle("-fx-text-fill: red;"); // Set text color
         rightContainer.getChildren().add(timeLabel);
-    
+
         // Event Log TextArea
         eventLog = new TextArea();
         eventLog.setEditable(false);
         eventLog.setPrefSize(150, 200); // Halfway into the screen, adjust as needed
         eventLog.setStyle("-fx-background-color: white; -fx-opacity: 1; -fx-border-color: black; -fx-border-width: 2;");
         rightContainer.getChildren().add(eventLog);
-    
+
         // Add VBox to the right region of the BorderPane
         root.setRight(rightContainer);
-    
+
         // Start the timer
         startTime = LocalTime.now();
         updateTimer(timeLabel);
-    
+
         return root;
     }
-    
-
-        
-    
-   
-    
-    
 
     private void updateTimer(Label timeLabel) {
         Thread timerThread = new Thread(() -> {
@@ -134,6 +126,7 @@ public class Arena {
 
         popupMenu.show(primaryStage, x, y);
     }
+
     public void setPrimaryStage(Stage primaryStage) {
         this.primaryStage = primaryStage;
     }

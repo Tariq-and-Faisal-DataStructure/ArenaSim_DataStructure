@@ -23,6 +23,9 @@ public class Player extends Map implements Updatable{
     private Player atack_who;
     private List<Player> atacking_me = new ArrayList<>();
     private int stop;
+    private int count;
+
+    
 
 
     public Player(){}
@@ -49,7 +52,7 @@ public class Player extends Map implements Updatable{
 }
 
     
-    
+
 
      public Player findClosestOponent(List<Player> enemies, Player currentPlayer) {
         Player closestPlayer = null;
@@ -63,8 +66,12 @@ public class Player extends Map implements Updatable{
                 closestPlayer = enemy;
             }
         }
-    
-        this.atack_who = closestPlayer;
+        // if(this.atack_who.health==0 || this.atack_who==null){
+            this.atack_who = closestPlayer;
+
+        // }else{
+        //     findClosestOponent(enemies, currentPlayer);
+        // }
         return closestPlayer;
     }
     
@@ -127,26 +134,34 @@ public class Player extends Map implements Updatable{
     
 
 
-    
+    // enimes is a list contan all enimes that are curntly attacking you
+    // attackWho is a refrense to who the cuurent enime is attaking (will be used in the main when iterating in all enimes )
         public List<Player> AtackingMe(List<Player> enemies, Player attackWho){
 
             for(Player attackMe:enemies){
                 if(attackMe.getAttackWho() == atack_who){
                     this.atacking_me.add(attackMe);
-                    if(this.atacking_me.size() < 4 ){
-                        System.out.println(this.getName());
-                     for(int i = 0; i<atacking_me.size(); i++){
-                         if(atacking_me.get(i) != null){
-                             System.out.println(atacking_me.get(i).getName());
-                         }
-                     }
-                     System.out.println("-----------------------------");
-                     stop +=1;
-                 }
+                    System.out.println(this.name+" attack: "+ attackWho.getName());
+
+                    // if(this.atacking_me.size() < 4 ){
+                    //     System.out.println(this.getName());
+                    //  for(int i = 0; i<atacking_me.size(); i++){
+                    //      if(atacking_me.get(i) != null){
+                    //          System.out.println(atacking_me.get(i).getName());
+                    //      }
+                    //  }
+                    //  System.out.println("-----------------------------");
+                    //  stop +=1;
+                    //  System.out.println("added attackr: "+stop);
+                    // }
                 }
                 else if(this.atacking_me.contains(attackMe) && attackMe.getAttackWho() != atack_who){
+                    System.out.println("-------------");
+                    count++;
                     this.atacking_me.remove(attackMe);
-                    System.out.println(attackMe.getName() +" is removed from" + " " + this.getName());
+                    System.out.println(attackWho.getName()+" stoped attakeing: "+this.name );
+                    // System.out.println(attackMe.getName() +" is removed from" + " " + this.getName());
+                    // System.out.println("Removed attacker"+ count);
                 }
                
             }
@@ -154,6 +169,15 @@ public class Player extends Map implements Updatable{
 
             return atacking_me;
         }
+
+    public List<Player> GetWhoAttackMe(Player player,Player enime){
+
+        for(int i =0;i<atacking_me.size();i++){
+            
+        }
+        return null;
+
+    }
 
         public void UpdateAtackingMe(){}
 
@@ -189,6 +213,11 @@ public class Player extends Map implements Updatable{
     public boolean getIsAtacking(){
         return isAttacking;
     }
+    // get refrnese of the enime who you are attaking 
+    public Player getEnimesRefrense(Player enime){
+        
+        return atack_who;
+    }
 
     public float getMaxHealth(){
         return maxHealth;
@@ -205,6 +234,11 @@ public class Player extends Map implements Updatable{
 
     public float getBaseAttackSpeed(){
         return BaseAttackSpeed;
+    }
+    public List<Player> getAttackingMe(){
+        
+
+        return this.atacking_me;
     }
 
     public void setHealth(float health){

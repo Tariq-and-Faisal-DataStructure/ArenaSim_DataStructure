@@ -1,7 +1,5 @@
 package ArenaSim_DataStructure.ArenaSim;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
 import javafx.geometry.Insets;
@@ -24,13 +22,13 @@ public class CharacterSelection {
     private void startGame() {
         List<CharacterSelection.CharacterAttributes> playerCharacters = getPlayerTeamCharacters();
         List<CharacterSelection.CharacterAttributes> enemyCharacters = getEnemyTeamCharacters();
-    
+
         // Create new lists for Player objects
-        
-    
-        // Create the arena scene with the selected characters and empty player/enemy lists
+
+        // Create the arena scene with the selected characters and empty player/enemy
+        // lists
         Scene arenaScene = Sample.createArenaScene(primaryStage, playerCharacters, enemyCharacters);
-    
+
         primaryStage.setScene(arenaScene);
     }
 
@@ -39,7 +37,6 @@ public class CharacterSelection {
             instance = this;
         }
     }
-    
 
     public CharacterSelection(Stage primaryStage, Scene mainMenuScene) {
         this.primaryStage = primaryStage;
@@ -66,10 +63,10 @@ public class CharacterSelection {
         // Logic to main_menu
         backButton.setOnAction(event -> primaryStage.setScene(mainMenuScene));
         Button startButton = new Button("Start");
-        
+
         Button defaultSetupButton = new Button("Default Setup");
         defaultSetupButton.setOnAction(event -> setupDefaultTeams());
-         // Logic to start the game
+        // Logic to start the game
         startButton.setOnAction(event -> {
 
             startGame();
@@ -80,32 +77,34 @@ public class CharacterSelection {
         characterSelectionPane.setBottom(buttonBox);
         return characterSelectionPane;
     }
+
     private void setupDefaultTeams() {
         // Temporary lists to hold characters
         List<CharacterAttributes> tempPlayerTeamCharacters = new ArrayList<>();
         List<CharacterAttributes> tempEnemyTeamCharacters = new ArrayList<>();
-    
+
         // Setup default characters for both teams
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 1; i++) {
             // Normal Players
-            tempPlayerTeamCharacters.add(new CharacterAttributes("Player " + (i+1), 15, 100, 1, 1, 100 * i, 130, false));
-            tempEnemyTeamCharacters.add(new CharacterAttributes("Enemy " + (i+1), 15, 100, 1, 1, 100 * i, 530, false));
+            tempPlayerTeamCharacters
+                    .add(new CharacterAttributes("Player " + (i + 1), 15, 100, 1, 1, 100 * i, 130, false));
+            tempEnemyTeamCharacters
+                    .add(new CharacterAttributes("Enemy " + (i + 1), 15, 100, 1, 1, 100 * i, 530, false));
         }
         // Special Players
         tempPlayerTeamCharacters.add(new CharacterAttributes("Special Player", 20, 150, 1.5f, 2, 300, 100, true));
         tempEnemyTeamCharacters.add(new CharacterAttributes("Special Enemy", 20, 150, 1.5f, 2, 300, 700, true));
-    
+
         // Clear current teams and UI elements
         playerTeamCharacters.clear();
         enemyTeamCharacters.clear();
         playerTeamAttributesBox.getChildren().clear();
         enemyTeamAttributesBox.getChildren().clear();
-    
+
         // Add temporary list characters to actual teams and update UI
         tempPlayerTeamCharacters.forEach(character -> addCharacterToTeam("Blue Team", character));
         tempEnemyTeamCharacters.forEach(character -> addCharacterToTeam("Red Team", character));
     }
-
 
     private VBox createTeamBox(String teamName, VBox teamAttributesBox) {
         HBox teamHeaderBox = new HBox(20);
@@ -114,11 +113,11 @@ public class CharacterSelection {
         Button addCharacterButton = new Button("Add Character");
         addCharacterButton.setOnAction(event -> showCharacterInputDialog(teamName));
         teamHeaderBox.getChildren().addAll(teamLabel, addCharacterButton);
-    
+
         // Wrap the attributes box in a ScrollPane for vertical scrolling
         ScrollPane teamScrollPane = new ScrollPane(teamAttributesBox);
         teamScrollPane.setFitToWidth(true);
-    
+
         VBox teamBox = new VBox(10, teamHeaderBox, teamScrollPane);
         teamBox.setPadding(new Insets(10));
         return teamBox;
@@ -169,20 +168,22 @@ public class CharacterSelection {
 
         dialog.getDialogPane().setContent(grid);
 
-        // Convert the result to a CharacterAttributes object when the "Add" button is clicked
+        // Convert the result to a CharacterAttributes object when the "Add" button is
+        // clicked
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton == addButton) {
                 try {
                     String name = nameField.getText();
                     float damage = Float.parseFloat(damageField.getText());
-                    float health =Float.parseFloat(healthField.getText());
-                    float attackSpeed =Float.parseFloat(attackSpeedField.getText());
-                    int movementSpeed =Integer.parseInt(movementSpeedField.getText());
+                    float health = Float.parseFloat(healthField.getText());
+                    float attackSpeed = Float.parseFloat(attackSpeedField.getText());
+                    int movementSpeed = Integer.parseInt(movementSpeedField.getText());
                     int xAxis = Integer.parseInt(xAxisField.getText());
                     int yAxis = Integer.parseInt(yAxisField.getText());
                     boolean isSpecialPlayer = specialPlayerCheckBox.isSelected();
 
-                    return new CharacterAttributes(name, damage, health, attackSpeed, movementSpeed, xAxis, yAxis, isSpecialPlayer);
+                    return new CharacterAttributes(name, damage, health, attackSpeed, movementSpeed, xAxis, yAxis,
+                            isSpecialPlayer);
                 } catch (NumberFormatException e) {
                     showAlert("Invalid input. Please enter numeric values.");
                     return null;
@@ -199,12 +200,12 @@ public class CharacterSelection {
 
     private void addCharacterToTeam(String teamName, CharacterAttributes attributes) {
         if (attributes != null) {
-            // Add logic to process the character attributes and add the character to the team
+            // Add logic to process the character attributes and add the character to the
+            // team
             // Create a new VBox with labels and lines to display the character attributes
             VBox characterAttributesBox = new VBox(5);
             Line topLine = new Line(0, 0, 200, 0);
             Line bottomLine = new Line(0, 0, 200, 0);
-
 
             characterAttributesBox.getChildren().addAll(
                     topLine,
@@ -213,15 +214,12 @@ public class CharacterSelection {
                     new Label("Health: " + attributes.health),
                     new Label("Attack Speed: " + attributes.attackSpeed),
                     new Label("Movement Speed: " + attributes.movementSpeed),
-                    new Label("X: "+ attributes.xAxis+" Y: "+ attributes.yAxis),
-                    new Label("special player  "+ attributes.isSpecialPlayer),
+                    new Label("X: " + attributes.xAxis + " Y: " + attributes.yAxis),
+                    new Label("special player  " + attributes.isSpecialPlayer),
                     bottomLine
-                    
-                    
 
             );
 
-            
             // Add the VBox to the appropriate team's attributes box
             if (teamName.equals("Blue Team")) {
                 playerTeamAttributesBox.getChildren().add(characterAttributesBox);
@@ -233,7 +231,7 @@ public class CharacterSelection {
         }
     }
 
-    private  void showAlert(String message) {
+    private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText(null);
@@ -248,7 +246,7 @@ public class CharacterSelection {
     public List<CharacterAttributes> getPlayerTeamCharacters() {
         return playerTeamCharacters;
     }
-    
+
     public List<CharacterAttributes> getEnemyTeamCharacters() {
         return enemyTeamCharacters;
     }
@@ -259,24 +257,21 @@ public class CharacterSelection {
         public float health;
         public float attackSpeed;
         public int movementSpeed;
-        public int xAxis ;
-        public int yAxis ;
+        public int xAxis;
+        public int yAxis;
         public boolean isSpecialPlayer;
 
-
-        public CharacterAttributes(String name, float damage, float health, float attackSpeed, int movementSpeed, int xAxis,int yAxis, boolean isSpecialPlayer) {
+        public CharacterAttributes(String name, float damage, float health, float attackSpeed, int movementSpeed,
+                int xAxis, int yAxis, boolean isSpecialPlayer) {
             this.name = name;
             this.damage = damage;
             this.health = health;
             this.attackSpeed = attackSpeed;
             this.movementSpeed = movementSpeed;
             this.xAxis = xAxis;
-            this.yAxis= yAxis ;
-            this.isSpecialPlayer=isSpecialPlayer;
+            this.yAxis = yAxis;
+            this.isSpecialPlayer = isSpecialPlayer;
         }
     }
 
-
-
-   
 }
