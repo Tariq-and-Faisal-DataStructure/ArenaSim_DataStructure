@@ -1,6 +1,7 @@
 package ArenaSim_DataStructure.ArenaSim;
 
 
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -14,9 +15,9 @@ public class SpecialPlayer extends Player {
     private long cooldownEndTime;
     private static final long RUN_DURATION = 10000; // 10 seconds
     private static final long COOLDOWN_DURATION = 15000; // 15 seconds
-    private static  PriorityQueue<Integer> priorityQueue = new PriorityQueue<>(); // Data structure
+    private static PriorityQueue<Integer> priorityQueue = new PriorityQueue<>(); // Data structure
     private static LinkedList<Integer> priorites = new LinkedList<>();
-    
+    Player player = new Player();
     
     
     public SpecialPlayer(){}
@@ -27,57 +28,101 @@ public class SpecialPlayer extends Player {
         this.isRunning = false;
         this.runEndTime = 0;
         this.cooldownEndTime = 0;
-        priorites.add(2); // attack
-        priorites.add(1); // run away when health below 25%
+        priorites.offer(1); // attack
+        priorites.offer(2); // run away when health below 25%
+       // this.priorityQueue = new PriorityQueue<>(createComparator());
+        System.out.println("size: " + priorityQueue.size());
+       
     }
 
-    // Sorting Algorithim
+    // show the content of PriorityQueue
+    public static void printPriorityQueue() {
+        System.out.println("Priority Queue Contents:");
+        PriorityQueue<Integer> copy = new PriorityQueue<>(priorityQueue); // Make a copy to avoid modifying the original
+        while (!copy.isEmpty()) {
+            System.out.print(copy.poll() + " ");
+        }
+        System.out.println(); // Move to the next line after printing all elements
+    }
+
     public static void pqSort() {
-        int n = priorites.size();
-        // Assuming LinkedList.remove() here simulates priorites.remove(priorites.first())
+         //System.out.println(priorityQueue.peek());
+        // Create a copy of the priorities list to work with
+        LinkedList<Integer> tempPriorities = new LinkedList<>(priorites);
+        int n = tempPriorities.size();
+    
+        // Clear and use the class-level priorityQueue
+        priorityQueue.clear();
+        priorityQueue = new PriorityQueue<>(Comparator.reverseOrder());
+
         for (int j = 0; j < n; j++) {
-            Integer element = priorites.removeFirst(); // Removes the first element, which is equivalent to priorites.remove(priorites.first())
-            priorityQueue.add(element); // Use add instead of insert
+            Integer element = tempPriorities.removeFirst(); // Remove from the temporary list
+            priorityQueue.add(element); // Add to the priority queue
         }
+    
+        tempPriorities.clear(); // Clear the temporary list to reuse it for sorted elements
+    
         for (int j = 0; j < n; j++) {
-            Integer element = priorityQueue.poll(); // Retrieves and removes the head of the queue, the smallest element
-            priorites.addLast(element); // Adds the element at the end of the list
+            Integer element = priorityQueue.poll(); // Retrieve and remove the smallest element from the queue
+            tempPriorities.addLast(element); // Add the sorted element to the temporary list
         }
+    
+        // Refill the class-level priorityQueue with sorted elements
+        priorityQueue.addAll(tempPriorities);
+        
+    }
+    
+    // keeps the default setup
+    public static void pqSortDescending() {
+       
+
+        // Create a copy of the priorities list to work with
+        LinkedList<Integer> tempPriorities = new LinkedList<>(priorites);
+        int n = tempPriorities.size();
+    
+        // Clear the class-level priorityQueue and use a new PriorityQueue with reverse order
+        priorityQueue.clear();
+        //priorityQueue = new PriorityQueue<>(Comparator.reverseOrder());
+    
+        for (int j = 0; j < n; j++) {
+            Integer element = tempPriorities.removeFirst(); // Remove from the temporary list
+            priorityQueue.add(element); // Add to the priority queue
+        }
+    
+        tempPriorities.clear(); // Clear the temporary list to reuse it for sorted elements
+    
+        for (int j = 0; j < n; j++) {
+            Integer element = priorityQueue.poll(); // Retrieve and remove the largest element from the queue
+            tempPriorities.addLast(element); // Add the sorted element to the temporary list
+        }
+    
+        // Refill the class-level priorityQueue with sorted elements
+        priorityQueue.addAll(tempPriorities);
+    
+        // Update the original list with sorted elements in descending order
+        priorites = tempPriorities;
+
     }
 
-     // iterate over enemies to check if any of them is attacking me
-    // public void checkAttackingMe(List<Player> enemies){
-    //     for(Player enemy:enemies){
-    //         if(enemy.getAttackWho() == this){
-    //             this.setAtackingMe(enemy);;
-    //         }
-    //     }
-
-    // }
 
     @Override
     public void updatePriority(Player enemy){
-        if(this.getHealth() < this.getMaxHealth() * 0.25 && this.getAttackingMe() != null){
-            pqSort();
+       
+        if(this.getHealth() < this.getMaxHealth() * 0.25 && enemy.getAttackWho() == this){
+            pqSort(); // make the priority run away
+        }
+        // In the case of running and no one is attacking the player, make the priority attack.
+        else if(this.getHealth() < this.getMaxHealth() * 0.25 && enemy.getAttackWho() != this){
+            priorityQueue.clear();  
+            priorityQueue.offer(1);
+
         }
         else{
-            priorityQueue.clear();
-            priorityQueue.addAll(priorites);
+            pqSortDescending(); // keep the default setup
         }
-
-    }
     
- 
-
-    // calls the methods based on the priority
-    public void handlePriority(){
-
-        if(this.priorityQueue.peek() == 1){
-            this.shouldStartRunning();
-        }
-        else if(this.priorityQueue.peek() == 2){
-            stopRunning();
-        }
+    
+        
     }
     
     // when running, move to opposite direction of the attacker
@@ -113,19 +158,20 @@ public class SpecialPlayer extends Player {
    
 
     public void updateRunningStatus() {
-        // Start running if the conditions are met and the player is not already running
-        if(this.priorityQueue.peek() == 1){
-            startRunning();
+        // Ensure there is at least one element in the queue before accessing it
+        if (!priorityQueue.isEmpty()) {
+            Integer currentPriority = priorityQueue.peek();
+            // if priority peek is 2 start running
+            if(currentPriority == 2){ 
+                startRunning();
+            }
+            else{
+                stopRunning();
+            }
+        } else {
+            // Handle the case where the queue is empty
+            System.out.println("Priority queue is empty. Cannot update running status.  "+ priorityQueue.size());
         }
-        else if(this.priorityQueue.peek() == 2){
-            stopRunning();
-        }
-    }
-    
-    private boolean shouldStartRunning() {
-        // The player should start running if their health is below 25%,
-        // they are not already running, and the cooldown has passed
-        return getHealth() <= getMaxHealth() * 0.25 && !isRunning && System.currentTimeMillis() > cooldownEndTime;
     }
     
     private void startRunning() {
@@ -148,7 +194,7 @@ public class SpecialPlayer extends Player {
     }
 
     public void update() {
-        handlePriority();
+        updateRunningStatus();
     }
 
     public boolean getIsRunning(){
