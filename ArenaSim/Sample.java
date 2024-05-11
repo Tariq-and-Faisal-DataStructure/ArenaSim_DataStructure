@@ -33,6 +33,7 @@ public class Sample extends Application {
     final double minY = 0.0;
     final double maxY = 720.0; // Height of the arena
     private static boolean gameStart = false;
+    
 
     // Hard codded obstacles:
     public static Circle rockCircle = new Circle(300, 300, 30, Color.BROWN);
@@ -47,9 +48,9 @@ public class Sample extends Application {
     public static Circle meteorCircle = new Circle(50, 50, 70, Color.ORANGE);
     public static MovableObstacles meteor = new MovableObstacles(1000000000, "Meteor", 0, meteorCircle);
 
-    public static Circle movingShaftCircle = new Circle(600, 300, 30, Color.DARKGRAY);
-    public static MovableObstacles movingShaft = new MovableObstacles(40, "MovingUnderGroundShaft", 2,
-            movingShaftCircle);
+    // public static Circle movingShaftCircle = new Circle(600, 300, 30, Color.DARKGRAY);
+    // public static MovableObstacles movingShaft = new MovableObstacles(40, "MovingUnderGroundShaft", 0,
+    //         movingShaftCircle);
 
     public static Scene createArenaScene(Stage primaryStage,
             List<CharacterSelection.CharacterAttributes> playerCharacters,
@@ -62,7 +63,7 @@ public class Sample extends Application {
         root.getChildren().addAll(rockCircle, holeCircle, undergroundshaftCircle);
 
         // Add to the list and to the root pane
-        root.getChildren().addAll(meteorCircle, movingShaftCircle);
+        root.getChildren().addAll(meteorCircle);
 
         // Create players and enemies via CharacerSelection class
         for (CharacterSelection.CharacterAttributes charAttr : playerCharacters) {
@@ -122,7 +123,7 @@ public class Sample extends Application {
         endgameflag = false;
         this.primaryStage = primaryStage; // Assign the passed stage to the class variable
 
-        movableObstacles = Arrays.asList(meteor, movingShaft);
+        movableObstacles = Arrays.asList(meteor);
         obstacles = Arrays.asList(rock, hole, undergroundshaft);
 
         mainMenu = new Main_menu(primaryStage);
@@ -177,27 +178,17 @@ public class Sample extends Application {
     // main loop 3 calls the updating methods
     private void updateAllCharacters(List<Player> characters, List<Player> targets) {
         List<Player> toRemove = new ArrayList<>();
-
+        
         for (Player character : characters) {
 
-            // for(Player target: targets){
-            // if(target.getAttackWho() == character ){
-            // character.setAtackingMe(target);
-            // // System.out.println(target.getName());
-            // // System.out.println("---------------")
-            // character.AtackingMe(targets,character);
-            // }
-
-            // }
-
-            // ********************* why print dose not work ******************
-
-            // the problem is that target will be added at one time so when we add the
-            // player is attkeing who he added all play imedetly isntade of wating to kill
-            // then move to another target
-            // character.AtackingMe(targets, character);
-            // *******************************************************************************************8888888888
-            // */
+            // check if the target is attacking this character
+           character.checkAttackingMe(targets);
+           // if character is a special player update the priorit based on the priority conditions
+           if(character instanceof SpecialPlayer){
+            for(Player target:targets){
+                    character.updatePriority(target);
+            }
+        }
             // Check for character death
             if (character.die(character.getHealth())) {
                 toRemove.add(character);
@@ -205,6 +196,7 @@ public class Sample extends Application {
 
                 continue; // Skip the rest of the processing for dead characters
             }
+
             gameStart = true;
             Point2D newPosition = character.getReadLocation();
             double newX = Math.min(Math.max(newPosition.getX(), minX), maxX);
@@ -217,15 +209,12 @@ public class Sample extends Application {
                 specialPlayer.updateRunningStatus();
 
                 if (specialPlayer.getIsRunning()) {
-
-                    Player closestTarget = character.findClosestOponent(targets, character);
-                    // specialPlayer.AtackingMe(targets, specialPlayer);
-
-                    if (closestTarget != null) {
-                        Circle targetCircle = closestTarget.getShape();
+                    if (character.getAttackingMe() != null) {
+                        Circle targetCircle = character.getAttackingMe().getShape();
                         specialPlayer.moveTowardsOppositeDirection(targetCircle.getCenterX(),
                                 targetCircle.getCenterY());
                     }
+                
                     continue; // Skip the rest of the loop for the running SpecialPlayer
                 }
             }
@@ -292,25 +281,27 @@ public class Sample extends Application {
 
             return; // Skip if already attacking or self-targeted
         }
+        
 
         attacker.setIsAtacking(true); // Mark attacker as attacking
 
         long attackDelay = (long) (1000 / attacker.getAtk_speed());
         ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-
+      
         executor.schedule(() -> {
             attacker.getEnimesRefrense(defender);// new
             if (!attacker.die(attacker.getHealth()) && !defender.die(defender.getHealth())) {
                 defender.setHealth(defender.takeDamage(defender.getHealth(), attacker.getDamage()));
                 Platform.runLater(() -> {
                     if (Arena.eventLog != null) {
-                        Arena.eventLog.appendText(attacker.getName() + " attacked " + defender.getName() + "\n");
+                        Arena.eventLog.appendText(attacker.getName() + " attacked " + attacker.getAttackWho().getName() + "\n");
                     }
                 });
             }
             attacker.setIsAtacking(false); // Reset attacking flag
             executor.shutdown(); // Terminate the scheduled task
         }, attackDelay, TimeUnit.MILLISECONDS);
+        
     }
 
     private void handlePlayerDeath(Player deadPlayer) {
@@ -401,6 +392,10 @@ public class Sample extends Application {
             }
         }
     }
+
+    
+
+   
 
     private void checkEndConditions() {
         if (gameStart && (players.isEmpty() || enemies.isEmpty())) {
