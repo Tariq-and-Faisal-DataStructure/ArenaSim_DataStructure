@@ -42,6 +42,35 @@ public class Player extends Map implements Updatable{
     }
     
 
+
+    public void sortPlayers(List<Player> players) {
+        System.out.println("before");
+        printPlayers(players);
+        // iterate over players
+        for (int i = 0; i < players.size(); i++) {
+            for (int j = i + 1; j < players.size(); j++) {
+                if (players.get(j).getHealth() > players.get(i).getHealth()) {
+                    // swapping process
+                    Player temp = players.get(i);
+                    players.set(i, players.get(j));  // replaces the element at i with element at j
+                    players.set(j, temp);            // replaces the element at j with temp (original i)
+                }
+            }
+        }
+    
+        System.out.println("after");
+        printPlayers(players);
+    }
+    
+    // print list of players for debugging 
+    public void printPlayers(List<Player> players){
+        for(Player player: players){
+            System.out.print(player.getHealth() + ", ");
+        }
+    }
+
+
+
     public boolean checkPlayerCollision(Circle character1, Circle character2) {
     double dx = character2.getCenterX() - character1.getCenterX();
     double dy = character2.getCenterY() - character1.getCenterY();
@@ -49,8 +78,6 @@ public class Player extends Map implements Updatable{
     return distance < (character1.getRadius() + character2.getRadius());
 }
 
-    
-    
 
      public Player findClosestOponent(List<Player> enemies, Player currentPlayer) {
         Player closestPlayer = null;
