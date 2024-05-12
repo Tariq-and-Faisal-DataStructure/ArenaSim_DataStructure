@@ -33,6 +33,7 @@ public class Sample extends Application {
     final double minY = 0.0;
     final double maxY = 720.0; // Height of the arena
     private static boolean gameStart = false;
+    public static Player dummy = new Player();
     
 
     // Hard codded obstacles:
@@ -77,6 +78,7 @@ public class Sample extends Application {
                 HealthBar playerHealthBar = blueTeam.getHealthBar(); // Assuming getHealthBar() method is defined in
                                                                      // Player
                 root.getChildren().add(playerHealthBar.getBar());
+                
             } else {
                 Circle blueTeamCircle = new Circle(charAttr.xAxis, charAttr.yAxis, 10, Color.BLUEVIOLET);
                 SpecialPlayer blueTeam = new SpecialPlayer(charAttr.health, charAttr.attackSpeed, charAttr.damage,
@@ -111,8 +113,8 @@ public class Sample extends Application {
                 root.getChildren().add(enemyHealthBar.getBar());
             }
         }
-
         // Initialize movements and attacks
+        dummy.sortPlayers(localPlayers);
         players = localPlayers; // Assign to class member
         enemies = localEnemies; // Assign to class member
         return new Scene(root, 1280, 720);
@@ -393,13 +395,24 @@ public class Sample extends Application {
         }
     }
 
+
     
 
    
 
     private void checkEndConditions() {
         if (gameStart && (players.isEmpty() || enemies.isEmpty())) {
+            for(Player player:players){
+                if(player instanceof SpecialPlayer){
+                    ((SpecialPlayer)player).setIsRunning(false);
+                }
+            }
 
+            for(Player enemy:enemies){
+                if(enemy instanceof SpecialPlayer){
+                    ((SpecialPlayer)enemy).setIsRunning(false);
+                }
+            }
             endGame();
         }
     }
