@@ -22,6 +22,7 @@ public class Player extends Map implements Updatable{
     private HealthBar healthBar;
     private Player atack_who;
     private Player atacking_me;
+    private boolean summoneMe; // if special player summone you this flag is true
     private int stop;
 
 
@@ -42,14 +43,12 @@ public class Player extends Map implements Updatable{
     }
     
 
-
+    // sort players from highest value in terms of health to loweset value
     public void sortPlayers(List<Player> players) {
-        System.out.println("before");
-        printPlayers(players);
         // iterate over players
         for (int i = 0; i < players.size(); i++) {
             for (int j = i + 1; j < players.size(); j++) {
-                if (players.get(j).getHealth() > players.get(i).getHealth()) {
+                if (players.get(j).getMaxHealth() > players.get(i).getMaxHealth()) {
                     // swapping process
                     Player temp = players.get(i);
                     players.set(i, players.get(j));  // replaces the element at i with element at j
@@ -57,9 +56,6 @@ public class Player extends Map implements Updatable{
                 }
             }
         }
-    
-        System.out.println("after");
-        printPlayers(players);
     }
     
     // print list of players for debugging 
@@ -236,6 +232,14 @@ public class Player extends Map implements Updatable{
 
     public Player getAttackingMe(){
         return this.atacking_me;
+    }
+
+    public boolean getSummoneMe(){
+        return this.summoneMe;
+    }
+
+    public void setSummoneMe(boolean summoneMe){
+        this.summoneMe = summoneMe;
     }
 
     public void setHealth(float health){
