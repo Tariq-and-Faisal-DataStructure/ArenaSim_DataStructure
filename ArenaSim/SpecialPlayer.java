@@ -17,6 +17,7 @@ public class SpecialPlayer extends Player {
     private static final long COOLDOWN_DURATION = 15000; // 15 seconds
     Player player = new Player();
     private static Queue<Integer> queue;
+    private boolean oneManStanding; // flag for checking if the special player is alive while teammates are all dead
     
     
     public SpecialPlayer(){}
@@ -34,13 +35,13 @@ public class SpecialPlayer extends Player {
        
     }
    
-    
+    // fix the logic of this method.
     @Override
     public void updatePriority(Player enemy){
         Integer temp;
 
         // run away logic
-        if(this.getHealth() < this.getMaxHealth() * 0.25 && enemy.getAttackWho() == this){
+        if(this.getHealth() < this.getMaxHealth() * 0.25 && enemy.getAttackWho() == this && !getIsOneManStanding()){
            
             for(int i = 1; i < queue.size(); i++){
                 if(queue.peek() != 2 && queue.peek() !=null){
@@ -50,14 +51,14 @@ public class SpecialPlayer extends Player {
             }
         }
         // summone logic
-        else if(this.getHealth() < this.getMaxHealth() * 0.25 && enemy.getAttackWho() != this){
+        else if(this.getHealth() < this.getMaxHealth() * 0.70 && enemy.getAttackWho() == this && !getIsOneManStanding()){
             for(int i = 1; i < queue.size(); i++){
                 if(queue.peek() != 3 && queue.peek() !=null){
                     temp = queue.remove();
                     queue.add(temp);
                 }
             }
-
+            //System.out.println("priority is :" + queue.peek());
         }
         else{
             // attack logic (default priority)
@@ -103,20 +104,30 @@ public class SpecialPlayer extends Player {
         });
     }
 
+    public void summonePlayer(Player player){
+        player.setSummoneMe(true);
+        player.moveTowards(this.getAttackingMe().getShape().getCenterX(),this.getAttackingMe().getShape().getCenterY());
+        System.out.println(player.getAttackWho().getName() + " " + this.getAttackingMe().getName());
+       
+    }
+
    
 
-    public void updateRunningStatus() {
+    public void updateRunningStatus(Player player) {
         long currentTime = System.currentTimeMillis();
         if (!queue.isEmpty()) {
             Integer currentPriority = queue.peek();
+            
             if (currentPriority == 2 && currentTime > cooldownEndTime) {
                 startRunning();
-            } else if (currentTime > runEndTime) {
+                player.setSummoneMe(false);
+            } else if (currentTime > runEndTime && currentPriority == 1) {
                 stopRunning();
             }
             // we want to implement the summoning algorithim
             else if (currentPriority == 3){
-
+                summonePlayer(player);
+                
             }
         } else {
             System.out.println("Priority queue is empty. Cannot update running status.");
@@ -150,11 +161,19 @@ public class SpecialPlayer extends Player {
     }
 
     public void update() {
-        updateRunningStatus();
+        updateRunningStatus(player);
     }
 
     public boolean getIsRunning(){
         return isRunning;
+    }
+
+    public boolean getIsOneManStanding(){
+        return this.oneManStanding;
+    }
+
+    public void setIsOneManStanding(boolean oneManStanding){
+        this.oneManStanding = oneManStanding;
     }
 
     public void setIsRunning(boolean condition){
