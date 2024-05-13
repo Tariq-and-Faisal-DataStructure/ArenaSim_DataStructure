@@ -34,6 +34,8 @@ public class Sample extends Application {
     final double maxY = 720.0; // Height of the arena
     private static boolean gameStart = false;
     public static Player dummy = new Player();
+    public static Player enemyofSpecialPlayer;
+
     
 
     // Hard codded obstacles:
@@ -114,7 +116,7 @@ public class Sample extends Application {
             }
         }
         // Initialize movements and attacks
-        dummy.sortPlayers(localPlayers);
+       
         players = localPlayers; // Assign to class member
         enemies = localEnemies; // Assign to class member
         return new Scene(root, 1280, 720);
@@ -151,6 +153,19 @@ public class Sample extends Application {
             gameLoop.stop();
         }
 
+        for(Player player:players){
+            if(player instanceof SpecialPlayer){
+                ((SpecialPlayer)player).setIsRunning(false); // reset running condition if game ends for players
+                ((SpecialPlayer)player).setIsOneManStanding(false); // reset condition for checking if the special player is alone
+            }
+        }
+        
+        for(Player enemy:enemies){
+            if(enemy instanceof SpecialPlayer){
+                ((SpecialPlayer)enemy).setIsRunning(false); // reset running condition if game ends for enemies
+                ((SpecialPlayer)enemy).setIsOneManStanding(false); // reset condition for checking if the special player is alone
+            }
+        }
         // Clear player and enemy lists
         players.clear();
         enemies.clear();
@@ -172,7 +187,7 @@ public class Sample extends Application {
         updateAllCharacters(players, enemies);
         // Update all red team members
         updateAllCharacters(enemies, players);
-
+        
         // Check if the game should end
         checkEndConditions();
     }
@@ -180,7 +195,7 @@ public class Sample extends Application {
     // main loop 3 calls the updating methods
     private void updateAllCharacters(List<Player> characters, List<Player> targets) {
         List<Player> toRemove = new ArrayList<>();
-        
+        dummy.sortPlayers(characters);
         for (Player character : characters) {
 
             // check if the target is attacking this character
@@ -188,7 +203,14 @@ public class Sample extends Application {
            // if character is a special player update the priorit based on the priority conditions
            if(character instanceof SpecialPlayer){
             for(Player target:targets){
+                if(playersMarkedForRemoval.size() == characters.size() - 1){
+                    ((SpecialPlayer)character).setIsOneManStanding(true);
+                }
+                    
                     character.updatePriority(target);
+                    enemyofSpecialPlayer = character.getAttackingMe();
+
+                    
             }
         }
             // Check for character death
@@ -208,7 +230,8 @@ public class Sample extends Application {
             // Special handling for SpecialPlayer
             if (character instanceof SpecialPlayer) {
                 SpecialPlayer specialPlayer = (SpecialPlayer) character;
-                specialPlayer.updateRunningStatus();
+                if(characters.get(0) != null && characters.get(0).getHealth() !=0 )
+                specialPlayer.updateRunningStatus(characters.get(0));
 
                 if (specialPlayer.getIsRunning()) {
                     if (character.getAttackingMe() != null) {
@@ -220,9 +243,13 @@ public class Sample extends Application {
                     continue; // Skip the rest of the loop for the running SpecialPlayer
                 }
             }
+            
             Player closestTarget = character.findClosestOponent(targets, character);
+         
             // closestTarget.AtackingMe(targets, closestTarget);
-
+            if(character.getSummoneMe()){
+                closestTarget = enemyofSpecialPlayer;
+            }
             // Normal movement or resuming movement after running
             if (closestTarget != null && !character.getIsAtacking()) {
                 Circle characterCircle = character.getShape();
@@ -402,18 +429,7 @@ public class Sample extends Application {
 
     private void checkEndConditions() {
         if (gameStart && (players.isEmpty() || enemies.isEmpty())) {
-            for(Player player:players){
-                if(player instanceof SpecialPlayer){
-                    ((SpecialPlayer)player).setIsRunning(false);
-                }
-            }
-
-            for(Player enemy:enemies){
-                if(enemy instanceof SpecialPlayer){
-                    ((SpecialPlayer)enemy).setIsRunning(false);
-                }
-            }
-            endGame();
+             endGame();
         }
     }
 
