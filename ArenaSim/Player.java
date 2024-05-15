@@ -49,7 +49,7 @@ public class Player extends Map implements Updatable{
         
         for (int i = 0; i < players.size(); i++) {
             for (int j = i + 1; j < players.size(); j++) {
-                if (players.get(j).getMaxHealth() > players.get(i).getMaxHealth()) {
+                if (players.get(j).getHealth() > players.get(i).getHealth()) {
                     // swapping process
                     Player temp = players.get(i);
                     players.set(i, players.get(j));  // replaces the element at i with element at j
@@ -58,6 +58,7 @@ public class Player extends Map implements Updatable{
             }
         }
     }
+    
     
     // print list of players for debugging 
     public void printPlayers(List<Player> players){
