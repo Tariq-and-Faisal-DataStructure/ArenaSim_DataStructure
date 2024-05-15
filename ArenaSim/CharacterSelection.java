@@ -82,19 +82,23 @@ public class CharacterSelection {
         // Temporary lists to hold characters
         List<CharacterAttributes> tempPlayerTeamCharacters = new ArrayList<>();
         List<CharacterAttributes> tempEnemyTeamCharacters = new ArrayList<>();
-
+        int scaler = 5;
         // Setup default characters for both teams
         for (int i = 0; i < 1; i++) {
             // Normal Players
             tempPlayerTeamCharacters
-                    .add(new CharacterAttributes("Player " + (i + 1), 15, 100, 1, 1, 100 * i, 130, false));
-            tempEnemyTeamCharacters
-                    .add(new CharacterAttributes("Enemy " + (i + 1), 15, 100, 1, 1, 100 * i, 530, false));
-        }
-        // Special Players
-        tempPlayerTeamCharacters.add(new CharacterAttributes("Special Player", 20, 150, 1.5f, 2, 300, 100, true));
-        tempEnemyTeamCharacters.add(new CharacterAttributes("Special Enemy", 20, 150, 1.5f, 2, 300, 700, true));
+            .add(new CharacterAttributes("Player " + (i + 1), 10, 100, 1, 1, 100 * i, 130, false));
+   
 
+            tempEnemyTeamCharacters
+            .add(new CharacterAttributes("Enemy " + (i + 1), 20, 200, 1, 1, 100 * i, 530, false));
+                   scaler --;
+        }
+        tempPlayerTeamCharacters
+        .add(new CharacterAttributes("Player " + ( 10), 10, 100, 1, 1, 500, 700, false));
+        // Special Players
+        //tempPlayerTeamCharacters.add(new CharacterAttributes("Special Player", 1, 100, 1.5f, 2, 300, 100, true));
+        tempEnemyTeamCharacters.add(new CharacterAttributes("Special Enemy", 1, 70, 1.5f, 4, 700, 700, true));
         // Clear current teams and UI elements
         playerTeamCharacters.clear();
         enemyTeamCharacters.clear();

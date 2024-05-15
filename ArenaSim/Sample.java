@@ -32,9 +32,9 @@ public class Sample extends Application {
     final double maxX = 1280.0; // Width of the arena
     final double minY = 0.0;
     final double maxY = 720.0; // Height of the arena
-    private static boolean gameStart = false;
-    public static Player dummy = new Player();
-    public static Player enemyofSpecialPlayer;
+    private  boolean gameStart = false;
+    public  Player dummy = new Player();
+    public  Player enemyofSpecialPlayer;
 
     
 
@@ -184,6 +184,7 @@ public class Sample extends Application {
     // main loop 2 calls main loop 3
     private void updateGame() {
         // Update all blue team members
+        
         updateAllCharacters(players, enemies);
         // Update all red team members
         updateAllCharacters(enemies, players);
@@ -205,14 +206,13 @@ public class Sample extends Application {
             for(Player target:targets){
                 if(playersMarkedForRemoval.size() == characters.size() - 1){
                     ((SpecialPlayer)character).setIsOneManStanding(true);
-                }
-                    
+                } 
                     character.updatePriority(target);
                     enemyofSpecialPlayer = character.getAttackingMe();
-
-                    
             }
         }
+           
+                   
             // Check for character death
             if (character.die(character.getHealth())) {
                 toRemove.add(character);
@@ -246,7 +246,6 @@ public class Sample extends Application {
             
             Player closestTarget = character.findClosestOponent(targets, character);
          
-            // closestTarget.AtackingMe(targets, closestTarget);
             if(character.getSummoneMe()){
                 closestTarget = enemyofSpecialPlayer;
             }

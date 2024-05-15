@@ -46,6 +46,7 @@ public class Player extends Map implements Updatable{
     // sort players from highest value in terms of health to loweset value
     public void sortPlayers(List<Player> players) {
         // iterate over players
+        
         for (int i = 0; i < players.size(); i++) {
             for (int j = i + 1; j < players.size(); j++) {
                 if (players.get(j).getMaxHealth() > players.get(i).getMaxHealth()) {
@@ -63,6 +64,7 @@ public class Player extends Map implements Updatable{
         for(Player player: players){
             System.out.print(player.getHealth() + ", ");
         }
+        System.out.println("----------");
     }
 
 

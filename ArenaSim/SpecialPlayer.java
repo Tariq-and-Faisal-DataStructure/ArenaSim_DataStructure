@@ -2,7 +2,6 @@ package ArenaSim_DataStructure.ArenaSim;
 
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 import javafx.application.Platform;
@@ -16,7 +15,7 @@ public class SpecialPlayer extends Player {
     private static final long RUN_DURATION = 1000; // 10 seconds
     private static final long COOLDOWN_DURATION = 15000; // 15 seconds
     Player player = new Player();
-    private static Queue<Integer> queue;
+    private Queue<Integer> queue;
     private boolean oneManStanding; // flag for checking if the special player is alive while teammates are all dead
     
     
@@ -39,9 +38,9 @@ public class SpecialPlayer extends Player {
     @Override
     public void updatePriority(Player enemy){
         Integer temp;
-
+        
         // run away logic
-        if(this.getHealth() < this.getMaxHealth() * 0.25 && enemy.getAttackWho() == this && !getIsOneManStanding()){
+        if(this.getHealth() < this.getMaxHealth() * 0.25 && enemy.getAttackWho() == this && !getIsOneManStanding() ){
            
             for(int i = 1; i < queue.size(); i++){
                 if(queue.peek() != 2 && queue.peek() !=null){
@@ -51,7 +50,7 @@ public class SpecialPlayer extends Player {
             }
         }
         // summone logic
-        else if(this.getHealth() < this.getMaxHealth() * 0.70 && enemy.getAttackWho() == this && !getIsOneManStanding()){
+        else if(this.getHealth() < this.getMaxHealth() * 0.70 && enemy.getAttackWho() == this && !getIsOneManStanding() ){
             for(int i = 1; i < queue.size(); i++){
                 if(queue.peek() != 3 && queue.peek() !=null){
                     temp = queue.remove();
@@ -105,19 +104,27 @@ public class SpecialPlayer extends Player {
     }
 
     public void summonePlayer(Player player){
+        if(!(player instanceof SpecialPlayer)){
         player.setSummoneMe(true);
-        player.moveTowards(this.getAttackingMe().getShape().getCenterX(),this.getAttackingMe().getShape().getCenterY());
-        System.out.println(player.getAttackWho().getName() + " " + this.getAttackingMe().getName());
-       
+        player.moveTowards(getAttackingMe().getShape().getCenterX(),getAttackingMe().getShape().getCenterY());
+        // System.out.println(player.getAttackWho().getName() + " " + this.getAttackingMe().getName());
+        }
     }
 
    
-
+    // The problem is that the Special Enemy's priority does not change. However, the 
+    // special player works fine. 
     public void updateRunningStatus(Player player) {
         long currentTime = System.currentTimeMillis();
         if (!queue.isEmpty()) {
+            if(this.getName().equals("Special Enemy")){
+                System.out.println("Name: " + this.getName());
+                System.out.println("peek : " + queue.peek());
+                System.out.println("current time: " + currentTime);
+                System.out.println("cooldown time: " + cooldownEndTime);
+                System.out.println("--------------------------");
+            }
             Integer currentPriority = queue.peek();
-            
             if (currentPriority == 2 && currentTime > cooldownEndTime) {
                 startRunning();
                 player.setSummoneMe(false);
