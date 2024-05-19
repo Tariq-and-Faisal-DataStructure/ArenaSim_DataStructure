@@ -31,16 +31,20 @@ public class SpecialPlayer extends Player {
         queue.add(1); // attack
         queue.add(2); // run away when health below 25%
         queue.add(3); // summone
-       
+        
+    }
+
+    public void printQueue(Queue<Integer> priorities){
+        for(Integer priority: priorities){
+            System.out.println(priority);
+        }
     }
    
-    // fix the logic of this method.
+    // method that updates the priority of the special player
     @Override
     public void updatePriority(Player enemy){
         Integer temp;
-        
-        // run away logic
-        if(this.getHealth() < this.getMaxHealth() * 0.25 && enemy.getAttackWho() == this && !getIsOneManStanding() ){
+        if(this.getHealth() < this.getMaxHealth() * 0.50 && this.getAttackingMe() != null && !getIsOneManStanding() ){
            
             for(int i = 1; i < queue.size(); i++){
                 if(queue.peek() != 2 && queue.peek() !=null){
@@ -50,14 +54,13 @@ public class SpecialPlayer extends Player {
             }
         }
         // summone logic
-        else if(this.getHealth() < this.getMaxHealth() * 0.70 && enemy.getAttackWho() == this && !getIsOneManStanding() ){
+        else if(this.getHealth() < this.getMaxHealth() * 0.70 && this.getAttackingMe() != null && !getIsOneManStanding()){
             for(int i = 1; i < queue.size(); i++){
                 if(queue.peek() != 3 && queue.peek() !=null){
                     temp = queue.remove();
                     queue.add(temp);
                 }
             }
-            //System.out.println("priority is :" + queue.peek());
         }
         else{
             // attack logic (default priority)
@@ -67,6 +70,7 @@ public class SpecialPlayer extends Player {
                     queue.add(temp);
                 }
             }
+          
         }
     
     
@@ -103,31 +107,30 @@ public class SpecialPlayer extends Player {
         });
     }
 
+    // this method is the logic of calling a teammate to help the special player
     public void summonePlayer(Player player){
         if(!(player instanceof SpecialPlayer)){
         player.setSummoneMe(true);
         player.moveTowards(getAttackingMe().getShape().getCenterX(),getAttackingMe().getShape().getCenterY());
-        // System.out.println(player.getAttackWho().getName() + " " + this.getAttackingMe().getName());
         }
     }
 
    
-    // The problem is that the Special Enemy's priority does not change. However, the 
-    // special player works fine. 
+    // update running status of the special player, this method needs a refrenece of the player with the highest health
     public void updateRunningStatus(Player player) {
         long currentTime = System.currentTimeMillis();
+        System.out.println(currentTime/1000 % 13);
         if (!queue.isEmpty()) {
-            if(this.getName().equals("Special Enemy")){
-                System.out.println("Name: " + this.getName());
-                System.out.println("peek : " + queue.peek());
-                System.out.println("current time: " + currentTime);
-                System.out.println("cooldown time: " + cooldownEndTime);
-                System.out.println("--------------------------");
-            }
+         
             Integer currentPriority = queue.peek();
-            if (currentPriority == 2 && currentTime > cooldownEndTime) {
-                startRunning();
-                player.setSummoneMe(false);
+            
+            if (currentPriority == 2) {
+                while (currentTime > cooldownEndTime) {
+                    startRunning();
+                    this.setAtackwho(null);
+                    player.setSummoneMe(false);
+                }
+                
             } else if (currentTime > runEndTime && currentPriority == 1) {
                 stopRunning();
             }
@@ -146,7 +149,7 @@ public class SpecialPlayer extends Player {
         if (System.currentTimeMillis() > cooldownEndTime) { // Only start running if the cooldown has expired
             isRunning = true;
             runEndTime = System.currentTimeMillis() + RUN_DURATION;
-            cooldownEndTime = runEndTime + 2000; // Cooldown period of 3 seconds after running ends
+            cooldownEndTime = runEndTime + 3000; // Cooldown period of 3 seconds after running ends
         } else {
             System.out.println("Cannot run: still in cooldown period.");
         }
