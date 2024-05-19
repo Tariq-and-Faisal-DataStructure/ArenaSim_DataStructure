@@ -157,6 +157,11 @@ public class Sample extends Application {
             if(player instanceof SpecialPlayer){
                 ((SpecialPlayer)player).setIsRunning(false); // reset running condition if game ends for players
                 ((SpecialPlayer)player).setIsOneManStanding(false); // reset condition for checking if the special player is alone
+                ((SpecialPlayer)player).setAtackingMe(null);
+                ((SpecialPlayer)player).setAtackwho(null);
+                player.setAtackingMe(null);
+                player.setAtackwho(null);
+                player.setSummoneMe(false);
             }
         }
         
@@ -164,6 +169,11 @@ public class Sample extends Application {
             if(enemy instanceof SpecialPlayer){
                 ((SpecialPlayer)enemy).setIsRunning(false); // reset running condition if game ends for enemies
                 ((SpecialPlayer)enemy).setIsOneManStanding(false); // reset condition for checking if the special player is alone
+                ((SpecialPlayer)enemy).setAtackingMe(null);
+                ((SpecialPlayer)enemy).setAtackwho(null);
+                enemy.setAtackingMe(null);
+                enemy.setAtackwho(null);
+                enemy.setSummoneMe(false);
             }
         }
         // Clear player and enemy lists
@@ -197,20 +207,38 @@ public class Sample extends Application {
     private void updateAllCharacters(List<Player> characters, List<Player> targets) {
         List<Player> toRemove = new ArrayList<>();
         dummy.sortPlayers(characters);
+
         for (Player character : characters) {
 
             // check if the target is attacking this character
            character.checkAttackingMe(targets);
            // if character is a special player update the priorit based on the priority conditions
-           if(character instanceof SpecialPlayer){
-            for(Player target:targets){
-                if(playersMarkedForRemoval.size() == characters.size() - 1){
-                    ((SpecialPlayer)character).setIsOneManStanding(true);
-                } 
-                    character.updatePriority(target);
-                    enemyofSpecialPlayer = character.getAttackingMe();
+           if (character instanceof SpecialPlayer) {
+            for (Player target : targets) {
+                if (characters.size() == 1) {
+                    // check if the special player is the only one in the team. Therfore, disable
+                    ((SpecialPlayer) character).setIsOneManStanding(true);
+                }
+              
+                // to avoid null pointer excception
+                try {
+                    // if the one who is attacking me is attacking someone else
+                    //System.out.println(character.getAttackingMe().getAttackWho().getName() + "attacked by " + character.getAttackingMe().getName());
+                    if(character.getAttackingMe().getAttackWho() != character){
+                        character.setAtackingMe(null);
+                    }
+                } catch (NullPointerException e) {
+                    //System.out.println("Null pointer");
+                }
+                
+                
+
+               
+                character.updatePriority(target);
+                enemyofSpecialPlayer = character.getAttackingMe();
             }
         }
+        
            
                    
             // Check for character death
@@ -246,9 +274,14 @@ public class Sample extends Application {
             
             Player closestTarget = character.findClosestOponent(targets, character);
          
-            if(character.getSummoneMe()){
-                closestTarget = enemyofSpecialPlayer;
+            try {
+                if(character.getSummoneMe() && enemyofSpecialPlayer != null){
+                    closestTarget = enemyofSpecialPlayer;
+                }
+            } catch (NullPointerException e) {
+                System.out.println("hello");
             }
+            
             // Normal movement or resuming movement after running
             if (closestTarget != null && !character.getIsAtacking()) {
                 Circle characterCircle = character.getShape();
