@@ -3,8 +3,6 @@ package ArenaSim_DataStructure.ArenaSim;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.scene.shape.Circle;
-
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -23,7 +21,6 @@ public class Player extends Map implements Updatable{
     private Player atack_who;
     private Player atacking_me;
     private boolean summoneMe; // if special player summone you this flag is true
-    private int stop;
 
 
     public Player(){}
@@ -69,7 +66,7 @@ public class Player extends Map implements Updatable{
     }
 
 
-
+    // check if the characters collide with each other
     public boolean checkPlayerCollision(Circle character1, Circle character2) {
     double dx = character2.getCenterX() - character1.getCenterX();
     double dy = character2.getCenterY() - character1.getCenterY();
@@ -77,7 +74,7 @@ public class Player extends Map implements Updatable{
     return distance < (character1.getRadius() + character2.getRadius());
 }
 
-
+    // find the closest oponent to the player, this method will be called in movetward method
      public Player findClosestOponent(List<Player> enemies, Player currentPlayer) {
         Player closestPlayer = null;
         double closestDistance = Double.MAX_VALUE;
@@ -95,17 +92,19 @@ public class Player extends Map implements Updatable{
         return closestPlayer;
     }
     
+    // called the distance in pixels, this mehtod will be called in findClosestOponent
     public double calculateDistance(Circle c1, Circle c2) {
         double dx = c1.getCenterX() - c2.getCenterX();
         double dy = c1.getCenterY() - c2.getCenterY();
         return Math.sqrt(dx * dx + dy * dy);
     }
     
-
+    // attack the enemy, this method will be called once the two players collide
     public void attack(Player target) {
         setHealth(takeDamage(target.getHealth(), this.getDamage()));
     }
     
+    // the logic for moving towards an enemy, this method needs a reference from find closest oponent
     public void moveTowards(double targetX, double targetY) {
         Point2D currentLocation = this.getReadLocation();
         double currentX = currentLocation.getX();
@@ -140,7 +139,7 @@ public class Player extends Map implements Updatable{
         });
     }
 
-    
+    // logic for updating the health bar that is appearing above the characters
     public void updateHealthBar() {
         this.healthBar.updateHealth(this.health, this.maxHealth);
         // Assuming getReadLocation() returns the current position of the player
@@ -148,13 +147,14 @@ public class Player extends Map implements Updatable{
         this.healthBar.updatePosition(currentPosition.getX(), currentPosition.getY());
     }
 
+    // logic for spawning the characters
     public void initializePlayer(double initialX, double initialY) {
             this.setReadLocation(new Point2D(initialX, initialY));
     }
     
 
 
-    
+        // flag for "if someone is attacking me"
         public boolean AtackingMe(Player enemy){
             if(enemy.atack_who == this){
                 return true;
@@ -164,18 +164,31 @@ public class Player extends Map implements Updatable{
            }
         }
 
+        // this method is for special player (it will be overridden)
         public void updatePriority(Player enemy){}
 
+        // this method is for special player (it will be overridden)
         public void UpdateAtackingMe(){}
 
+        // check if someone is attacking me and save their reference
         public void checkAttackingMe(List<Player> enemies){
             for(Player enemy:enemies){
-                if(enemy.getAttackWho() == this){
-                    this.setAtackingMe(enemy);;
-                }
+                try {
+               
+                
+                    if(enemy.getAttackWho() == this && enemy.getHealth() > 0){
+                        this.setAtackingMe(enemy);;
+                    }
+                    else if(this.getAttackingMe().getHealth() <= 0){
+                        this.setAtackingMe(null);
+                    }
+                  
+                } catch (NullPointerException e) {
             }
+        }
     
         }
+        
 
     public Player getAttackWho(){
         return this.atack_who;
