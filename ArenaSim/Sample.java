@@ -210,10 +210,22 @@ public class Sample extends Application {
     // main loop 3 calls the updating methods
     private void updateAllCharacters(List<Player> characters, List<Player> targets) {
         List<Player> toRemove = new ArrayList<>();
+
+        
         
 
         for (Player character : characters) {
           
+            // check if the special player is dead, therefore, reset the falg of the player summoned
+            try {
+                if(character.getSommoneMe().getHealth() <= 0){
+                    character.setIsSummoneMe(false);
+                }
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+            
+
             if(character.getSommoneMe() != null){
             try {
                 if(character.getSommoneMe() != null && character.getHealth() > 0){
@@ -234,6 +246,7 @@ public class Sample extends Application {
                     ((SpecialPlayer) character).setIsOneManStanding(true);
                 }
               
+                
                 
                
                 // to avoid null pointer excception
