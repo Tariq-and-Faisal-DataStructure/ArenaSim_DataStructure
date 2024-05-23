@@ -22,7 +22,7 @@ public class Sample extends Application {
     public static boolean endgameflag;
     private Stage primaryStage;
     public static Main_menu mainMenu;
-    public static List<Player> players = new ArrayList<>();
+    public static List<Player> players = new ArrayList<>(); // goal done
     public static List<Player> enemies = new ArrayList<>();
     private List<Obstacles> obstacles;
     private List<Player> playersMarkedForRemoval = new ArrayList<>();
@@ -33,8 +33,11 @@ public class Sample extends Application {
     final double minY = 0.0;
     final double maxY = 720.0; // Height of the arena
     private  boolean gameStart = false;
-    public  Player dummy = new Player();
+    public static  Player dummy = new Player();
     public  Player enemyofSpecialPlayer;
+    public Circle targetCircle;
+    Player closestTarget;
+
 
     
 
@@ -116,7 +119,8 @@ public class Sample extends Application {
             }
         }
         // Initialize movements and attacks
-       
+        dummy.sortPlayers(players);
+        dummy.sortPlayers(enemies);
         players = localPlayers; // Assign to class member
         enemies = localEnemies; // Assign to class member
         return new Scene(root, 1280, 720);
@@ -161,7 +165,7 @@ public class Sample extends Application {
                 ((SpecialPlayer)player).setAtackwho(null);
                 player.setAtackingMe(null);
                 player.setAtackwho(null);
-                player.setSummoneMe(false);
+                player.setIsSummoneMe(false);
             }
         }
         
@@ -173,7 +177,7 @@ public class Sample extends Application {
                 ((SpecialPlayer)enemy).setAtackwho(null);
                 enemy.setAtackingMe(null);
                 enemy.setAtackwho(null);
-                enemy.setSummoneMe(false);
+                enemy.setIsSummoneMe(false);
             }
         }
         // Clear player and enemy lists
@@ -206,10 +210,20 @@ public class Sample extends Application {
     // main loop 3 calls the updating methods
     private void updateAllCharacters(List<Player> characters, List<Player> targets) {
         List<Player> toRemove = new ArrayList<>();
-        dummy.sortPlayers(characters);
+        
 
         for (Player character : characters) {
-
+          
+            if(character.getSommoneMe() != null){
+            try {
+                if(character.getSommoneMe() != null && character.getHealth() > 0){
+                    // if the summoned player isn't dead don't sort
+                }
+                else{
+                     dummy.sortPlayers(characters);}
+            } catch (Exception e) {
+            }
+        }
             // check if the target is attacking this character
            character.checkAttackingMe(targets);
            // if character is a special player update the priorit based on the priority conditions
@@ -220,10 +234,14 @@ public class Sample extends Application {
                     ((SpecialPlayer) character).setIsOneManStanding(true);
                 }
               
+                
+               
                 // to avoid null pointer excception
                 try {
+                    // keep a temporary refernce of the last enemy who attacked me
+                    character.setWasAtackingMe(character.getAttackingMe());
+
                     // if the one who is attacking me is attacking someone else
-                    //System.out.println(character.getAttackingMe().getAttackWho().getName() + "attacked by " + character.getAttackingMe().getName());
                     if(character.getAttackingMe().getAttackWho() != character){
                         character.setAtackingMe(null);
                     }
@@ -235,7 +253,7 @@ public class Sample extends Application {
 
                
                 character.updatePriority(target);
-                enemyofSpecialPlayer = character.getAttackingMe();
+                enemyofSpecialPlayer = character.getWasAtackingMe();
             }
         }
         
@@ -262,24 +280,43 @@ public class Sample extends Application {
                 specialPlayer.updateRunningStatus(characters.get(0));
 
                 if (specialPlayer.getIsRunning()) {
-                    if (character.getAttackingMe() != null) {
-                        Circle targetCircle = character.getAttackingMe().getShape();
-                        specialPlayer.moveTowardsOppositeDirection(targetCircle.getCenterX(),
+                    if (character.getAttackingMe() != null ||  specialPlayer.getIsRunning() ) {
+                        
+                        // in the running logic, when the special player runs, getAttacking me method = null
+                        // in order to force the player to continue running for the cooldown period
+                        // a reference of the enemy is saved in getgetWasAtackingMe
+                        // Therefore, there are two situations, either the getattacking me != null. Which
+                        // will make the player runs until the enemy doesn't attack the player anymore.
+                        // the second situation, is where the enemy doesn't attack the player, so we get a reference
+                        // of the enemy by getWasAtackingMe so the player continue running until cooldown ends
+                        if(specialPlayer.getAttackingMe() != null){
+                            targetCircle = character.getAttackingMe().getShape();
+                        }
+                        else if(specialPlayer.getWasAtackingMe() != null){
+                            targetCircle = character.getWasAtackingMe().getShape();
+
+                        }
+                        
+                            specialPlayer.moveTowardsOppositeDirection(targetCircle.getCenterX(),
                                 targetCircle.getCenterY());
+
                     }
                 
                     continue; // Skip the rest of the loop for the running SpecialPlayer
                 }
             }
             
-            Player closestTarget = character.findClosestOponent(targets, character);
          
             try {
-                if(character.getSummoneMe() && enemyofSpecialPlayer != null){
-                    closestTarget = enemyofSpecialPlayer;
-                }
+                // ensure that the summoned player go to the special player
+                if (character.getIsSummoneMe()) {
+                    if (enemyofSpecialPlayer != null) {
+                        closestTarget = enemyofSpecialPlayer;
+                    }
+                } else {
+                  closestTarget =  character.findClosestOponent(targets, character);                }
+                
             } catch (NullPointerException e) {
-                System.out.println("hello");
             }
             
             // Normal movement or resuming movement after running
