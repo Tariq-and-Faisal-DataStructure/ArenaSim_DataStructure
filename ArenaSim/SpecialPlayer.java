@@ -6,6 +6,7 @@ import java.util.Queue;
 
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 public class SpecialPlayer extends Player {
@@ -15,10 +16,11 @@ public class SpecialPlayer extends Player {
     private static final long RUN_DURATION = 1000; // 10 seconds
     private static final long COOLDOWN_DURATION = 15000; // 15 seconds
     Player player = new Player();
-    private Queue<Integer> queue;
+    private Queue<Integer> queue; // goal done
     private boolean oneManStanding; // flag for checking if the special player is alive while teammates are all dead
     
     
+
     public SpecialPlayer(){}
 
     public SpecialPlayer(float health, float atk_speed, float damage, int movementSpeed, String name, Circle shape) {
@@ -44,7 +46,7 @@ public class SpecialPlayer extends Player {
     @Override
     public void updatePriority(Player enemy){
         Integer temp;
-        if(this.getHealth() < this.getMaxHealth() * 0.50 && this.getAttackingMe() != null && !getIsOneManStanding() ){
+        if(this.getHealth() < this.getMaxHealth() * 0.20 && this.getAttackingMe() != null && !getIsOneManStanding() ){
            
             for(int i = 1; i < queue.size(); i++){
                 if(queue.peek() != 2 && queue.peek() !=null){
@@ -55,6 +57,7 @@ public class SpecialPlayer extends Player {
         }
         // summone logic
         else if(this.getHealth() < this.getMaxHealth() * 0.70 && this.getAttackingMe() != null && !getIsOneManStanding()){
+
             for(int i = 1; i < queue.size(); i++){
                 if(queue.peek() != 3 && queue.peek() !=null){
                     temp = queue.remove();
@@ -71,9 +74,7 @@ public class SpecialPlayer extends Player {
                 }
             }
           
-        }
-    
-    
+        }    
         
     }
     
@@ -110,8 +111,14 @@ public class SpecialPlayer extends Player {
     // this method is the logic of calling a teammate to help the special player
     public void summonePlayer(Player player){
         if(!(player instanceof SpecialPlayer)){
-        player.setSummoneMe(true);
-        player.moveTowards(getAttackingMe().getShape().getCenterX(),getAttackingMe().getShape().getCenterY());
+        if(player.getName().contains("Enemy")){
+            player.getShape().setFill(Color.MAROON);
+        }
+        if(player.getName().contains("Player")){
+            player.getShape().setFill(Color.NAVY);
+        }
+        player.setSommoneMe(this);
+        player.setIsSummoneMe(true);
         }
     }
 
@@ -119,17 +126,14 @@ public class SpecialPlayer extends Player {
     // update running status of the special player, this method needs a refrenece of the player with the highest health
     public void updateRunningStatus(Player player) {
         long currentTime = System.currentTimeMillis();
-        System.out.println(currentTime/1000 % 13);
+
         if (!queue.isEmpty()) {
-         
             Integer currentPriority = queue.peek();
-            
-            if (currentPriority == 2) {
-                while (currentTime > cooldownEndTime) {
+
+            if (currentPriority == 2 && currentTime > cooldownEndTime && getAttackingMe() != null) {
+                
                     startRunning();
-                    this.setAtackwho(null);
-                    player.setSummoneMe(false);
-                }
+                    this.setAtackwho(null);                
                 
             } else if (currentTime > runEndTime && currentPriority == 1) {
                 stopRunning();
@@ -149,7 +153,7 @@ public class SpecialPlayer extends Player {
         if (System.currentTimeMillis() > cooldownEndTime) { // Only start running if the cooldown has expired
             isRunning = true;
             runEndTime = System.currentTimeMillis() + RUN_DURATION;
-            cooldownEndTime = runEndTime + 3000; // Cooldown period of 3 seconds after running ends
+            cooldownEndTime = runEndTime + 2000; // Cooldown period of 3 seconds after running ends
         } else {
             System.out.println("Cannot run: still in cooldown period.");
         }
@@ -180,6 +184,22 @@ public class SpecialPlayer extends Player {
 
     public boolean getIsOneManStanding(){
         return this.oneManStanding;
+    }
+
+    public void setRunEndTime(long runEndTime) {
+        this.runEndTime = runEndTime;
+    }
+
+    public long getCooldownEndTime() {
+        return cooldownEndTime;
+    }
+
+    public long getRunEndTime() {
+        return runEndTime;
+    }
+
+    public void setCooldownEndTime(long cooldownEndTime) {
+        this.cooldownEndTime = cooldownEndTime;
     }
 
     public void setIsOneManStanding(boolean oneManStanding){
