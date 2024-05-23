@@ -20,7 +20,10 @@ public class Player extends Map implements Updatable{
     private HealthBar healthBar;
     private Player atack_who;
     private Player atacking_me;
-    private boolean summoneMe; // if special player summone you this flag is true
+    private boolean issummoneMe; // if special player summone you this flag is true
+    private Player sommoneMe;
+    private Player wasAtackingMe;
+
 
 
     public Player(){}
@@ -41,8 +44,15 @@ public class Player extends Map implements Updatable{
     
 
     // sort players from highest value in terms of health to loweset value
+    // goal done
     public void sortPlayers(List<Player> players) {
+        Player peekPlayer = new Player();
         // iterate over players
+        try {
+             peekPlayer = players.get(0);
+        } catch (IndexOutOfBoundsException e) {
+            // TODO: handle exception
+        }
         
         for (int i = 0; i < players.size(); i++) {
             for (int j = i + 1; j < players.size(); j++) {
@@ -54,11 +64,13 @@ public class Player extends Map implements Updatable{
                 }
             }
         }
+            
     }
     
     
     // print list of players for debugging 
     public void printPlayers(List<Player> players){
+        
         for(Player player: players){
             System.out.print(player.getHealth() + ", ");
         }
@@ -177,7 +189,7 @@ public class Player extends Map implements Updatable{
                
                 
                     if(enemy.getAttackWho() == this && enemy.getHealth() > 0){
-                        this.setAtackingMe(enemy);;
+                        this.setAtackingMe(enemy);
                     }
                     else if(this.getAttackingMe().getHealth() <= 0){
                         this.setAtackingMe(null);
@@ -250,12 +262,29 @@ public class Player extends Map implements Updatable{
         return this.atacking_me;
     }
 
-    public boolean getSummoneMe(){
-        return this.summoneMe;
+    public boolean getIsSummoneMe(){
+        return this.issummoneMe;
     }
 
-    public void setSummoneMe(boolean summoneMe){
-        this.summoneMe = summoneMe;
+    public Player getWasAtackingMe() {
+        return wasAtackingMe;
+    }
+
+    public Player getSommoneMe() {
+        return sommoneMe;
+    }
+
+    public void setSommoneMe(Player sommoneMe) {
+        this.sommoneMe = sommoneMe;
+    }
+
+
+    public void setWasAtackingMe(Player wasAtackingMe) {
+        this.wasAtackingMe = wasAtackingMe;
+    }
+
+    public void setIsSummoneMe(boolean summoneMe){
+        this.issummoneMe = summoneMe;
     }
 
     public void setHealth(float health){
